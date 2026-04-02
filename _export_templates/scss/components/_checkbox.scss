@@ -1,0 +1,145 @@
+// components/_checkbox.scss — MD3 Checkbox
+// ─────────────────────────────────────────────────────────────────────────────
+// Styles a native <input type="checkbox"> to match MD3 checkbox specification.
+// Uses appearance: none to replace the native control entirely.
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   <label class="md-checkbox-label">
+//     <input class="md-checkbox" type="checkbox">
+//     Label text
+//   </label>
+//
+//   Indeterminate state (set via JS — element.indeterminate = true):
+//   <input class="md-checkbox" type="checkbox">
+//
+//   Error state:
+//   <input class="md-checkbox md-checkbox--error" type="checkbox">
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-primary / on-primary / on-surface / on-surface-variant
+//   --md-sys-color-outline / error
+//   --md-sys-shape-corner-extra-small
+//   --md-sys-state-hover-state-layer-opacity
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-checkbox {
+  appearance:     none;
+  -webkit-appearance: none;
+  width:          1.125rem;      // 18px — MD3 checkbox size
+  height:         1.125rem;
+  border:         2px solid var(--md-sys-color-on-surface-variant);
+  border-radius:  var(--md-sys-shape-corner-extra-small);
+  background:     transparent;
+  cursor:         pointer;
+  position:       relative;
+  flex-shrink:    0;
+  transition:     background   var(--md-sys-motion-duration-short3)
+                               var(--md-sys-motion-easing-standard),
+                  border-color var(--md-sys-motion-duration-short3)
+                               var(--md-sys-motion-easing-standard);
+
+  // State layer ring (touch target + hover feedback)
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         -0.625rem;    // 10px — expands to 40px touch target
+    border-radius: 50%;
+    background:    var(--md-sys-color-on-surface);
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+  }
+
+  &:hover::before      { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  &:active::before     { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+
+  // Checkmark (::after)
+  &::after {
+    content:       '';
+    position:      absolute;
+    display:       none;
+  }
+
+  // Checked state
+  &:checked {
+    background:   var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+
+    &::before {
+      background: var(--md-sys-color-primary);
+    }
+
+    // Draw checkmark via clip-path
+    &::after {
+      display:     block;
+      left:        0.25rem;
+      top:         0.0625rem;
+      width:       0.375rem;
+      height:      0.625rem;
+      border:      2px solid var(--md-sys-color-on-primary);
+      border-top:  none;
+      border-left: none;
+      transform:   rotate(45deg);
+    }
+  }
+
+  // Indeterminate state
+  &:indeterminate {
+    background:   var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+
+    &::before { background: var(--md-sys-color-primary); }
+
+    &::after {
+      display:     block;
+      left:        0.1875rem;
+      top:         50%;
+      width:       0.625rem;
+      height:      2px;
+      background:  var(--md-sys-color-on-primary);
+      transform:   translateY(-50%);
+    }
+  }
+
+  // Error state
+  &.md-checkbox--error {
+    border-color: var(--md-sys-color-error);
+    &::before    { background: var(--md-sys-color-error); }
+
+    &:checked, &:indeterminate {
+      background:   var(--md-sys-color-error);
+      border-color: var(--md-sys-color-error);
+    }
+  }
+
+  // Disabled state
+  &:disabled {
+    cursor:       not-allowed;
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    pointer-events: none;
+
+    &::before { display: none; }
+
+    &:checked, &:indeterminate {
+      background:   color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+      border-color: transparent;
+    }
+  }
+}
+
+.md-checkbox-label {
+  display:     inline-flex;
+  align-items: center;
+  gap:         0.75rem;
+  cursor:      pointer;
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size:   var(--md-sys-typescale-body-large-size);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+  color:       var(--md-sys-color-on-surface);
+
+  &:has(.md-checkbox:disabled) {
+    cursor: not-allowed;
+    color:  color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}

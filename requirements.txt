@@ -1,0 +1,3 @@
+This project does not have external dependencies.
+Packages for development (sass and typescript) are vendored in _imports.
+Node.js is required to build the project and should be installed separately.

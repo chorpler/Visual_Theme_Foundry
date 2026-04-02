@@ -1,0 +1,248 @@
+// components/_textfield.scss — MD3 Text Field Variants
+// ─────────────────────────────────────────────────────────────────────────────
+// Filled and outlined text field variants for <input> and <textarea>.
+// Label float, active indicator, and focus states are CSS-only.
+//
+// ─── Markup — Filled ──────────────────────────────────────────────────────────
+//   IMPORTANT: <input> MUST come before <span class="md-textfield__label">.
+//   The CSS float uses the ~ sibling selector:
+//     .md-textfield__input:not(:placeholder-shown) ~ .md-textfield__label
+//   This only selects subsequent siblings, so input must precede label in the DOM.
+//
+//   <label class="md-textfield md-textfield--filled">
+//     <input class="md-textfield__input" type="email" placeholder=" ">
+//     <span class="md-textfield__label">Email address</span>
+//     <span class="md-textfield__indicator"></span>
+//   </label>
+//
+// ─── Markup — Outlined ────────────────────────────────────────────────────────
+//   <label class="md-textfield md-textfield--outlined">
+//     <input class="md-textfield__input" type="password" placeholder=" ">
+//     <span class="md-textfield__label">Password</span>
+//   </label>
+//
+// ─── Markup — With support text or error ──────────────────────────────────────
+//   <div class="md-textfield-wrapper">
+//     <label class="md-textfield md-textfield--filled">
+//       <input class="md-textfield__input" type="text" placeholder=" ">
+//       <span class="md-textfield__label">Username</span>
+//       <span class="md-textfield__indicator"></span>
+//     </label>
+//     <p class="md-textfield__support">Must be at least 4 characters.</p>
+//   </div>
+//
+//   Error state — add .md-textfield--error to the label element:
+//   <label class="md-textfield md-textfield--filled md-textfield--error">
+//
+// ─── Label float behavior ─────────────────────────────────────────────────────
+// The label floats up when the input is focused OR has a value. This requires
+// placeholder=" " (a single space) on the input so CSS can detect non-empty
+// state via :not(:placeholder-shown). This is a pure CSS technique.
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-primary / on-surface / on-surface-variant
+//   --md-sys-color-surface-container-highest
+//   --md-sys-color-outline / outline-variant
+//   --md-sys-color-error / on-error-container
+//   --md-sys-shape-corner-extra-small / corner-small
+//   --md-sys-typescale-body-large-* / label-medium-* / body-small-*
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Shared base ──────────────────────────────────────────────────────────────
+
+.md-textfield {
+  display:   block;
+  position:  relative;
+  width:     100%;
+  cursor:    text;
+}
+
+.md-textfield__input {
+  width:           100%;
+  border:          none;
+  outline:         none;
+  background:      transparent;
+  color:           var(--md-sys-color-on-surface);
+  font-family:     var(--md-sys-typescale-body-large-font);
+  font-size:       var(--md-sys-typescale-body-large-size);
+  font-weight:     var(--md-sys-typescale-body-large-weight);
+  line-height:     var(--md-sys-typescale-body-large-line-height);
+  caret-color:     var(--md-sys-color-primary);
+
+  &::placeholder { color: transparent; }  // placeholder is hidden; label handles hint text
+
+  &:disabled {
+    color:  color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    cursor: not-allowed;
+  }
+}
+
+.md-textfield__label {
+  position:        absolute;
+  pointer-events:  none;
+  color:           var(--md-sys-color-on-surface-variant);
+  font-family:     var(--md-sys-typescale-body-large-font);
+  font-size:       var(--md-sys-typescale-body-large-size);
+  line-height:     var(--md-sys-typescale-body-large-line-height);
+  transform-origin:top left;
+  transition:      transform var(--md-sys-motion-duration-short3)
+                             var(--md-sys-motion-easing-standard),
+                   color     var(--md-sys-motion-duration-short3)
+                             var(--md-sys-motion-easing-standard);
+}
+
+// Label float — active when input is focused or has a value
+// :not(:placeholder-shown) detects a filled input (requires placeholder=" ")
+%label-floated {
+  font-family:  var(--md-sys-typescale-label-medium-font);
+  font-size:    var(--md-sys-typescale-label-medium-size);
+  font-weight:  var(--md-sys-typescale-label-medium-weight);
+  line-height:  var(--md-sys-typescale-label-medium-line-height);
+  color:        var(--md-sys-color-primary);
+}
+
+.md-textfield__support {
+  font-family:  var(--md-sys-typescale-body-small-font);
+  font-size:    var(--md-sys-typescale-body-small-size);
+  font-weight:  var(--md-sys-typescale-body-small-weight);
+  color:        var(--md-sys-color-on-surface-variant);
+  margin:       0.25rem 1rem 0;
+  display:      block;
+}
+
+.md-textfield-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Filled ───────────────────────────────────────────────────────────────────
+
+.md-textfield--filled {
+  height:           3.5rem;     // 56px
+  background:       var(--md-sys-color-surface-container-highest);
+  border-radius:    var(--md-sys-shape-corner-extra-small)
+                    var(--md-sys-shape-corner-extra-small)
+                    0 0;
+
+  // Active indicator line at bottom (replaces border-bottom)
+  &::after {
+    content:          '';
+    position:         absolute;
+    bottom:           0;
+    left:             0;
+    right:            0;
+    height:           1px;
+    background:       var(--md-sys-color-on-surface-variant);
+    transition:       height var(--md-sys-motion-duration-short3)
+                             var(--md-sys-motion-easing-standard),
+                      background var(--md-sys-motion-duration-short3)
+                                 var(--md-sys-motion-easing-standard);
+  }
+
+  &:focus-within::after {
+    height:     2px;
+    background: var(--md-sys-color-primary);
+  }
+
+  .md-textfield__label {
+    left:   1rem;
+    top:    50%;
+    transform: translateY(-50%);
+  }
+
+  .md-textfield__input {
+    padding:    1.5rem 1rem 0.5rem;
+  }
+
+  // Float label when focused or filled
+  &:focus-within .md-textfield__label,
+  .md-textfield__input:not(:placeholder-shown) ~ .md-textfield__label {
+    @extend %label-floated;
+    transform: translateY(calc(-50% - 0.625rem));
+  }
+
+  // Unfocused filled input keeps label small but uses on-surface-variant color
+  .md-textfield__input:not(:placeholder-shown):not(:focus) ~ .md-textfield__label {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  &:hover::after {
+    background: var(--md-sys-color-on-surface);
+  }
+}
+
+// ─── Outlined ─────────────────────────────────────────────────────────────────
+
+.md-textfield--outlined {
+  height:        3.5rem;     // 56px
+  border:        1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  transition:    border-color var(--md-sys-motion-duration-short3)
+                              var(--md-sys-motion-easing-standard);
+
+  &:focus-within {
+    border-color: var(--md-sys-color-primary);
+    border-width: 2px;
+  }
+
+  &:hover:not(:focus-within) {
+    border-color: var(--md-sys-color-on-surface);
+  }
+
+  .md-textfield__label {
+    left:   0.75rem;
+    top:    50%;
+    transform: translateY(-50%);
+    padding:   0 0.25rem;
+    background: var(--md-sys-color-surface); // covers the border line behind label
+  }
+
+  .md-textfield__input {
+    padding: 0 1rem;
+    height:  100%;
+  }
+
+  // Float label when focused or filled
+  &:focus-within .md-textfield__label,
+  .md-textfield__input:not(:placeholder-shown) ~ .md-textfield__label {
+    @extend %label-floated;
+    transform: translateY(calc(-50% - 1.75rem));
+  }
+
+  .md-textfield__input:not(:placeholder-shown):not(:focus) ~ .md-textfield__label {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+}
+
+// ─── Error state ──────────────────────────────────────────────────────────────
+
+.md-textfield--error {
+  &.md-textfield--filled::after,
+  &.md-textfield--filled:hover::after  { background: var(--md-sys-color-error); }
+  &.md-textfield--filled:focus-within::after { background: var(--md-sys-color-error); }
+
+  &.md-textfield--outlined             { border-color: var(--md-sys-color-error); }
+  &.md-textfield--outlined:focus-within { border-color: var(--md-sys-color-error); }
+
+  .md-textfield__label     { color: var(--md-sys-color-error); }
+  + .md-textfield__support { color: var(--md-sys-color-error); }
+}
+
+// ─── Disabled state ───────────────────────────────────────────────────────────
+
+.md-textfield:has(.md-textfield__input:disabled) {
+  pointer-events: none;
+
+  &.md-textfield--filled {
+    background: color-mix(in srgb, var(--md-sys-color-on-surface) 4%, transparent);
+    &::after   { background: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent); }
+  }
+
+  &.md-textfield--outlined {
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  }
+
+  .md-textfield__label {
+    color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}

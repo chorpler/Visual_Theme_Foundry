@@ -1,0 +1,142 @@
+// components/_icon-button.scss — MD3 Icon Button Variants
+// ─────────────────────────────────────────────────────────────────────────────
+// Standard, filled, tonal, and outlined icon button variants.
+// Icon content is typically a text glyph from an icon font or an inline SVG.
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   Icon content uses span.md-icon (see components/_icon.scss). The button sets
+//   `color` via token; the span's background-color: currentColor inherits it.
+//   Pass the SVG path via --icon-src on the span's inline style.
+//
+//   Standard (no container):
+//   <button class="md-icon-btn" aria-label="Search">
+//     <span class="md-icon" style="--icon-src: url('/icons/search.svg')" aria-hidden="true"></span>
+//   </button>
+//
+//   Filled:
+//   <button class="md-icon-btn md-icon-btn--filled" aria-label="Add">
+//     <span class="md-icon" style="--icon-src: url('/icons/add.svg')" aria-hidden="true"></span>
+//   </button>
+//
+//   Tonal:
+//   <button class="md-icon-btn md-icon-btn--tonal" aria-label="Favorite">
+//     <span class="md-icon" style="--icon-src: url('/icons/favorite.svg')" aria-hidden="true"></span>
+//   </button>
+//
+//   Outlined:
+//   <button class="md-icon-btn md-icon-btn--outlined" aria-label="Edit">
+//     <span class="md-icon" style="--icon-src: url('/icons/edit.svg')" aria-hidden="true"></span>
+//   </button>
+//
+//   Toggle — use aria-pressed and JS to toggle .md-icon-btn--selected:
+//   <button class="md-icon-btn md-icon-btn--filled md-icon-btn--toggle"
+//           aria-label="Bookmark" aria-pressed="false">
+//     <span class="md-icon" style="--icon-src: url('/icons/bookmark.svg')" aria-hidden="true"></span>
+//   </button>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-on-surface / on-surface-variant / primary
+//   --md-sys-color-primary / on-primary / secondary-container / on-secondary-container
+//   --md-sys-color-outline
+//   --md-sys-shape-corner-full
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+
+.md-icon-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  width:           2.5rem;        // 40px — MD3 icon button size
+  height:          2.5rem;
+  border-radius:   var(--md-sys-shape-corner-full);
+  border:          none;
+  background:      transparent;
+  color:           var(--md-sys-color-on-surface-variant);
+  font-size:       1.5rem;        // 24px icon size
+  line-height:     1;
+  cursor:          pointer;
+  position:        relative;
+  overflow:        hidden;
+  padding:         0;
+  outline:         none;
+  flex-shrink:     0;
+  transition:      background var(--md-sys-motion-duration-short3)
+                              var(--md-sys-motion-easing-standard);
+
+  // State layer
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         0;
+    border-radius: inherit;
+    background:    currentColor;
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+    pointer-events:none;
+  }
+
+  &:hover::before         { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  &:active::before        { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+
+  &:disabled {
+    cursor:         not-allowed;
+    pointer-events: none;
+    color:          color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}
+
+// ─── Filled ───────────────────────────────────────────────────────────────────
+
+.md-icon-btn--filled {
+  background: var(--md-sys-color-primary);
+  color:      var(--md-sys-color-on-primary);
+
+  &:disabled {
+    background: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color:      color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+
+  // Toggle: unselected filled shows inverse colors
+  &.md-icon-btn--toggle:not(.md-icon-btn--selected) {
+    background: var(--md-sys-color-surface-container-highest, var(--md-sys-color-surface-variant));
+    color:      var(--md-sys-color-primary);
+  }
+}
+
+// ─── Tonal ────────────────────────────────────────────────────────────────────
+
+.md-icon-btn--tonal {
+  background: var(--md-sys-color-secondary-container);
+  color:      var(--md-sys-color-on-secondary-container);
+
+  &:disabled {
+    background: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color:      color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+
+  &.md-icon-btn--toggle:not(.md-icon-btn--selected) {
+    background: var(--md-sys-color-surface-container-highest, var(--md-sys-color-surface-variant));
+    color:      var(--md-sys-color-on-surface-variant);
+  }
+}
+
+// ─── Outlined ─────────────────────────────────────────────────────────────────
+
+.md-icon-btn--outlined {
+  border:     1px solid var(--md-sys-color-outline);
+  color:      var(--md-sys-color-on-surface-variant);
+
+  &:disabled {
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color:        color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+
+  &.md-icon-btn--toggle.md-icon-btn--selected {
+    background:   var(--md-sys-color-inverse-surface);
+    color:        var(--md-sys-color-inverse-on-surface);
+    border-color: transparent;
+  }
+}

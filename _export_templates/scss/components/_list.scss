@@ -1,0 +1,162 @@
+// components/_list.scss — MD3 List
+// ─────────────────────────────────────────────────────────────────────────────
+// List container and list items with single-line, two-line, and three-line
+// variants. Supports leading icons, avatars, and trailing elements.
+//
+// ─── Markup — Basic list ──────────────────────────────────────────────────────
+//   <ul class="md-list">
+//     <li class="md-list-item">Single line item</li>
+//     <li class="md-list-item">Another item</li>
+//   </ul>
+//
+// ─── Markup — With headline and supporting text ────────────────────────────────
+//   <ul class="md-list">
+//     <li class="md-list-item">
+//       <span class="md-list-item__headline">Primary text</span>
+//       <span class="md-list-item__supporting">Supporting text</span>
+//     </li>
+//   </ul>
+//
+// ─── Markup — With leading icon ───────────────────────────────────────────────
+//   <ul class="md-list">
+//     <li class="md-list-item">
+//       <span class="md-list-item__start" aria-hidden="true">inbox</span>
+//       <span class="md-list-item__headline">Inbox</span>
+//     </li>
+//   </ul>
+//
+// ─── Markup — With trailing element ──────────────────────────────────────────
+//   <ul class="md-list">
+//     <li class="md-list-item">
+//       <span class="md-list-item__headline">Label</span>
+//       <span class="md-list-item__end">→</span>
+//     </li>
+//   </ul>
+//
+// ─── Interactive items ────────────────────────────────────────────────────────
+//   Make an item interactive by using <a> or <button> as the list item:
+//   <ul class="md-list">
+//     <button class="md-list-item md-list-item--interactive">
+//       <span class="md-list-item__headline">Go somewhere</span>
+//     </button>
+//   </ul>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-surface / on-surface / on-surface-variant / outline-variant
+//   --md-sys-typescale-body-large-* / body-medium-* / label-small-*
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-list {
+  list-style:  none;
+  margin:      0;
+  padding:     0.5rem 0;         // 8px vertical padding per MD3 spec
+  background:  var(--md-sys-color-surface);
+  color:       var(--md-sys-color-on-surface);
+}
+
+.md-list-item {
+  display:         flex;
+  align-items:     center;
+  gap:             1rem;
+  min-height:      3.5rem;       // 56px — single line height
+  padding:         0.5rem 1rem;
+  position:        relative;
+  overflow:        hidden;
+  background:      none;
+  border:          none;
+  width:           100%;
+  text-align:      left;
+  color:           var(--md-sys-color-on-surface);
+  text-decoration: none;
+  cursor:          default;
+  box-sizing:      border-box;
+
+  // Body area grows to fill available space
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display:   flex;
+    flex-direction: column;
+  }
+
+  // Headline — body large
+  &__headline {
+    font-family:  var(--md-sys-typescale-body-large-font);
+    font-size:    var(--md-sys-typescale-body-large-size);
+    font-weight:  var(--md-sys-typescale-body-large-weight);
+    line-height:  var(--md-sys-typescale-body-large-line-height);
+    white-space:  nowrap;
+    overflow:     hidden;
+    text-overflow:ellipsis;
+    display:      block;
+  }
+
+  // Supporting text — body medium, secondary color
+  &__supporting {
+    font-family:  var(--md-sys-typescale-body-medium-font);
+    font-size:    var(--md-sys-typescale-body-medium-size);
+    font-weight:  var(--md-sys-typescale-body-medium-weight);
+    line-height:  var(--md-sys-typescale-body-medium-line-height);
+    color:        var(--md-sys-color-on-surface-variant);
+    white-space:  nowrap;
+    overflow:     hidden;
+    text-overflow:ellipsis;
+    display:      block;
+  }
+
+  // Three-line: allow supporting text to wrap up to 2 lines
+  &--three-line {
+    min-height: 5.5rem;    // 88px
+
+    .md-list-item__supporting {
+      white-space:    normal;
+      display:        -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow:       hidden;
+    }
+  }
+
+  // Start slot (leading icon or avatar)
+  &__start {
+    font-size:  1.5rem;
+    color:      var(--md-sys-color-on-surface-variant);
+    flex-shrink:0;
+    line-height:1;
+  }
+
+  // End slot (trailing icon, text, or action)
+  &__end {
+    font-size:    var(--md-sys-typescale-label-small-size);
+    color:        var(--md-sys-color-on-surface-variant);
+    flex-shrink:  0;
+    margin-left:  auto;
+  }
+
+  // Interactive variant — pointer cursor, state layer
+  &--interactive {
+    cursor: pointer;
+    outline: none;
+
+    &::before {
+      content:       '';
+      position:      absolute;
+      inset:         0;
+      background:    currentColor;
+      opacity:       0;
+      transition:    opacity var(--md-sys-motion-duration-short2)
+                             var(--md-sys-motion-easing-standard);
+      pointer-events:none;
+    }
+
+    &:hover::before         { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+    &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+    &:active::before        { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+
+    &:disabled {
+      cursor:  not-allowed;
+      pointer-events: none;
+      color:   color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    }
+  }
+}

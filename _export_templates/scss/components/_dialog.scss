@@ -1,0 +1,125 @@
+// components/_dialog.scss — MD3 Dialog
+// ─────────────────────────────────────────────────────────────────────────────
+// Styles a native <dialog> element to match MD3 basic dialog specification.
+// Open/close behavior is handled by behaviors.js (showModal / close).
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   <dialog class="md-dialog" id="my-dialog">
+//     <h2 class="md-dialog__headline">Dialog title</h2>
+//     <div class="md-dialog__content">
+//       <p>Supporting text that explains the dialog's purpose.</p>
+//     </div>
+//     <div class="md-dialog__actions">
+//       <button class="md-btn md-btn--text" data-dialog-close>Cancel</button>
+//       <button class="md-btn md-btn--text" data-dialog-close>Confirm</button>
+//     </div>
+//   </dialog>
+//
+//   Trigger (opens as modal):
+//   <button class="md-btn md-btn--filled" data-dialog-open="my-dialog">Open</button>
+//
+//   Note: the data-dialog-open and data-dialog-close attributes are processed by
+//   behaviors.js. Without behaviors.js, open/close must be managed manually:
+//     document.getElementById('my-dialog').showModal();
+//     document.getElementById('my-dialog').close();
+//
+// ─── Animation ────────────────────────────────────────────────────────────────
+// Entry animation uses @starting-style (supported in Chrome 117+, Firefox 129+).
+// For broader compatibility, add an open class toggle and animate via JS.
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-surface-container-high / on-surface / on-surface-variant
+//   --md-sys-shape-corner-extra-large
+//   --md-sys-elevation-level3
+//   --md-sys-typescale-headline-small-* / body-medium-*
+//   --md-sys-motion-duration-medium2 / easing-emphasized-decelerate
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-dialog {
+  // Reset native dialog styles
+  border:        none;
+  padding:       0;
+  overflow:      hidden;
+
+  // Dimensions — MD3 specifies 280–560px width range
+  width:         clamp(17.5rem, 50vw, 35rem);
+  max-width:     calc(100vw - 3rem);
+  max-height:    calc(100vh - 3rem);
+
+  // Surface
+  background:    var(--md-sys-color-surface-container-high);
+  color:         var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+  box-shadow:    var(--md-sys-elevation-level3);
+
+  // Entry animation
+  transition:    opacity  var(--md-sys-motion-duration-medium2)
+                          var(--md-sys-motion-easing-emphasized-decelerate),
+                transform var(--md-sys-motion-duration-medium2)
+                          var(--md-sys-motion-easing-emphasized-decelerate),
+                display   var(--md-sys-motion-duration-medium2)
+                          var(--md-sys-motion-easing-emphasized-decelerate)
+                          allow-discrete,
+                overlay   var(--md-sys-motion-duration-medium2)
+                          var(--md-sys-motion-easing-emphasized-decelerate)
+                          allow-discrete;
+
+  opacity:   1;
+  transform: translateY(0) scale(1);
+
+  @starting-style {
+    opacity:   0;
+    transform: translateY(1.5rem) scale(0.92);
+  }
+
+  &:not([open]) {
+    opacity:   0;
+    transform: translateY(1.5rem) scale(0.92);
+    pointer-events: none;
+  }
+
+  // Backdrop
+  &::backdrop {
+    background: var(--md-sys-color-scrim);
+    opacity:    0.32;
+    transition: opacity   var(--md-sys-motion-duration-medium2)
+                          var(--md-sys-motion-easing-emphasized-decelerate),
+                display   var(--md-sys-motion-duration-medium2) allow-discrete,
+                overlay   var(--md-sys-motion-duration-medium2) allow-discrete;
+
+    @starting-style { opacity: 0; }
+  }
+}
+
+// ─── Sub-elements ─────────────────────────────────────────────────────────────
+
+.md-dialog__headline {
+  font-family:  var(--md-sys-typescale-headline-small-font);
+  font-size:    var(--md-sys-typescale-headline-small-size);
+  font-weight:  var(--md-sys-typescale-headline-small-weight);
+  line-height:  var(--md-sys-typescale-headline-small-line-height);
+  color:        var(--md-sys-color-on-surface);
+  margin:       0;
+  padding:      1.5rem 1.5rem 1rem;
+}
+
+.md-dialog__content {
+  font-family:  var(--md-sys-typescale-body-medium-font);
+  font-size:    var(--md-sys-typescale-body-medium-size);
+  font-weight:  var(--md-sys-typescale-body-medium-weight);
+  line-height:  var(--md-sys-typescale-body-medium-line-height);
+  color:        var(--md-sys-color-on-surface-variant);
+  padding:      0 1.5rem;
+  overflow-y:   auto;
+  max-height:   40vh;
+}
+
+.md-dialog__actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             0.5rem;
+  padding:         1.5rem 1rem 1.5rem;
+
+  // Ensure text buttons in actions get correct left padding
+  .md-btn--text { padding: 0 0.75rem; }
+}

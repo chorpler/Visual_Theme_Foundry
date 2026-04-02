@@ -1,0 +1,154 @@
+// components/_progress.scss — MD3 Progress Indicators
+// ─────────────────────────────────────────────────────────────────────────────
+// Linear and circular progress indicators in determinate and indeterminate modes.
+//
+// ─── Markup — Linear determinate ─────────────────────────────────────────────
+//   <div class="md-progress-linear" role="progressbar"
+//        aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+//     <div class="md-progress-linear__track">
+//       <div class="md-progress-linear__indicator" style="width: 60%"></div>
+//     </div>
+//   </div>
+//
+// ─── Markup — Linear indeterminate ───────────────────────────────────────────
+//   <div class="md-progress-linear md-progress-linear--indeterminate"
+//        role="progressbar" aria-label="Loading">
+//     <div class="md-progress-linear__track">
+//       <div class="md-progress-linear__indicator"></div>
+//     </div>
+//   </div>
+//
+// ─── Markup — Circular determinate ────────────────────────────────────────────
+//   Set --md-progress-value (0–100) as an inline style to control fill.
+//
+//   <div class="md-progress-circular" role="progressbar"
+//        aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
+//        style="--md-progress-value: 75">
+//     <svg viewBox="0 0 48 48" class="md-progress-circular__svg">
+//       <circle class="md-progress-circular__track" cx="24" cy="24" r="20"/>
+//       <circle class="md-progress-circular__indicator" cx="24" cy="24" r="20"/>
+//     </svg>
+//   </div>
+//
+// ─── Markup — Circular indeterminate ─────────────────────────────────────────
+//   <div class="md-progress-circular md-progress-circular--indeterminate"
+//        role="progressbar" aria-label="Loading">
+//     <svg viewBox="0 0 48 48" class="md-progress-circular__svg">
+//       <circle class="md-progress-circular__track" cx="24" cy="24" r="20"/>
+//       <circle class="md-progress-circular__indicator" cx="24" cy="24" r="20"/>
+//     </svg>
+//   </div>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-primary / secondary-container
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Linear ───────────────────────────────────────────────────────────────────
+
+.md-progress-linear {
+  width: 100%;
+
+  &__track {
+    width:         100%;
+    height:        0.25rem;    // 4px — MD3 spec
+    background:    var(--md-sys-color-secondary-container);
+    border-radius: 9999px;
+    overflow:      hidden;
+    position:      relative;
+  }
+
+  &__indicator {
+    height:        100%;
+    background:    var(--md-sys-color-primary);
+    border-radius: inherit;
+    transition:    width var(--md-sys-motion-duration-medium2)
+                        var(--md-sys-motion-easing-emphasized);
+  }
+}
+
+// Linear indeterminate animation
+@keyframes md-progress-linear-indeterminate {
+  0%   { left: -35%;  width: 35%; }
+  60%  { left: 100%;  width: 100%; }
+  100% { left: 100%;  width: 35%; }
+}
+
+@keyframes md-progress-linear-short {
+  0%   { left: -200%; width: 35%; }
+  60%  { left: 107%;  width: 35%; }
+  100% { left: 107%;  width: 35%; }
+}
+
+.md-progress-linear--indeterminate .md-progress-linear__indicator {
+  width:    35%;
+  position: absolute;
+  animation:md-progress-linear-indeterminate
+            var(--md-sys-motion-duration-extra-long2, 2100ms) linear infinite;
+
+  &::after {
+    content:   '';
+    position:  absolute;
+    top:       0; bottom: 0; left: 0; right: 0;
+    background:var(--md-sys-color-primary);
+    animation: md-progress-linear-short
+               var(--md-sys-motion-duration-extra-long2, 2100ms) linear infinite;
+  }
+}
+
+// ─── Circular ─────────────────────────────────────────────────────────────────
+
+$_circ-radius: 20;       // SVG circle radius (viewBox 0 0 48 48, center 24 24)
+$_circ-circum: 125.664;  // 2π × 20 ≈ 125.664
+
+.md-progress-circular {
+  width:    3rem;    // 48px
+  height:   3rem;
+
+  &__svg {
+    width:  100%;
+    height: 100%;
+    transform: rotate(-90deg);     // start fill from 12 o'clock
+  }
+
+  &__track {
+    fill:        none;
+    stroke:      var(--md-sys-color-secondary-container);
+    stroke-width:4;
+  }
+
+  &__indicator {
+    fill:             none;
+    stroke:           var(--md-sys-color-primary);
+    stroke-width:     4;
+    stroke-linecap:   round;
+    stroke-dasharray: #{$_circ-circum};
+    // Determinate: set stroke-dashoffset based on --md-progress-value (0–100)
+    stroke-dashoffset: calc(
+      #{$_circ-circum} - (#{$_circ-circum} * var(--md-progress-value, 0) / 100)
+    );
+    transition: stroke-dashoffset var(--md-sys-motion-duration-medium2)
+                                  var(--md-sys-motion-easing-emphasized);
+  }
+}
+
+// Circular indeterminate animation
+@keyframes md-progress-circular-rotate {
+  to { transform: rotate(calc(-90deg + 360deg)); }
+}
+
+@keyframes md-progress-circular-dash {
+  0%   { stroke-dashoffset: #{$_circ-circum};      stroke-dasharray: #{$_circ-circum * 0.01} #{$_circ-circum}; }
+  50%  { stroke-dashoffset: #{$_circ-circum * 0.2}; stroke-dasharray: #{$_circ-circum * 0.75} #{$_circ-circum}; }
+  100% { stroke-dashoffset: #{$_circ-circum};      stroke-dasharray: #{$_circ-circum * 0.01} #{$_circ-circum}; }
+}
+
+.md-progress-circular--indeterminate {
+  .md-progress-circular__svg {
+    animation: md-progress-circular-rotate 1.8s linear infinite;
+  }
+
+  .md-progress-circular__indicator {
+    animation: md-progress-circular-dash 1.8s var(--md-sys-motion-easing-legacy, ease-in-out) infinite;
+    transition: none;
+  }
+}

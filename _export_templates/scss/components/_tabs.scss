@@ -1,0 +1,168 @@
+// components/_tabs.scss — MD3 Tabs (Primary and Secondary)
+// ─────────────────────────────────────────────────────────────────────────────
+// Primary tabs: full-width, used for top-level navigation between views.
+// Secondary tabs: compact, used for related content within a view.
+//
+// ─── Markup — Primary tabs ────────────────────────────────────────────────────
+//   <div class="md-tabs md-tabs--primary" role="tablist">
+//     <button class="md-tab md-tab--primary md-tab--active"
+//             role="tab" aria-selected="true">
+//       <span class="md-tab__icon" aria-hidden="true">home</span>
+//       <span class="md-tab__label">Home</span>
+//     </button>
+//     <button class="md-tab md-tab--primary" role="tab" aria-selected="false">
+//       <span class="md-tab__icon" aria-hidden="true">search</span>
+//       <span class="md-tab__label">Search</span>
+//     </button>
+//     <button class="md-tab md-tab--primary" role="tab" aria-selected="false">
+//       <span class="md-tab__label">Library</span>
+//     </button>
+//   </div>
+//
+// ─── Markup — Secondary tabs ──────────────────────────────────────────────────
+//   <div class="md-tabs md-tabs--secondary" role="tablist">
+//     <button class="md-tab md-tab--secondary md-tab--active"
+//             role="tab" aria-selected="true">All</button>
+//     <button class="md-tab md-tab--secondary"
+//             role="tab" aria-selected="false">Music</button>
+//     <button class="md-tab md-tab--secondary"
+//             role="tab" aria-selected="false">Video</button>
+//   </div>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-primary / on-surface / on-surface-variant / outline-variant
+//   --md-sys-color-surface-container
+//   --md-sys-typescale-title-small-* / label-large-*
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Tab bar container ────────────────────────────────────────────────────────
+
+.md-tabs {
+  display:          flex;
+  overflow-x:       auto;
+  scrollbar-width:  none;
+  position:         relative;
+
+  &::-webkit-scrollbar { display: none; }
+
+  // Divider at bottom of tab bar
+  &::after {
+    content:    '';
+    position:   absolute;
+    bottom:     0;
+    left:       0;
+    right:      0;
+    height:     1px;
+    background: var(--md-sys-color-outline-variant);
+  }
+}
+
+// ─── Primary tab bar ──────────────────────────────────────────────────────────
+
+.md-tabs--primary {
+  background: var(--md-sys-color-surface);
+}
+
+// ─── Secondary tab bar ────────────────────────────────────────────────────────
+
+.md-tabs--secondary {
+  background: var(--md-sys-color-surface);
+}
+
+// ─── Tab button base ──────────────────────────────────────────────────────────
+
+.md-tab {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.25rem;
+  border:          none;
+  background:      transparent;
+  cursor:          pointer;
+  position:        relative;
+  overflow:        hidden;
+  padding:         0;
+  outline:         none;
+  flex-shrink:     0;
+  color:           var(--md-sys-color-on-surface-variant);
+  transition:      color var(--md-sys-motion-duration-short3)
+                        var(--md-sys-motion-easing-standard);
+
+  // State layer
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         0;
+    background:    currentColor;
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+    pointer-events:none;
+  }
+
+  &:hover::before         { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  &:active::before        { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+
+  // Active indicator bar (bottom)
+  &::after {
+    content:       '';
+    position:      absolute;
+    bottom:        0;
+    left:          0;
+    right:         0;
+    height:        3px;
+    border-radius: 3px 3px 0 0;
+    background:    var(--md-sys-color-primary);
+    transform:     scaleX(0);
+    transition:    transform var(--md-sys-motion-duration-short3)
+                             var(--md-sys-motion-easing-emphasized);
+  }
+
+  &--active {
+    color: var(--md-sys-color-primary);
+    &::after { transform: scaleX(1); }
+  }
+}
+
+.md-tab__icon {
+  font-size:   1.5rem;
+  line-height: 1;
+}
+
+// ─── Primary tab ──────────────────────────────────────────────────────────────
+// Minimum 48px height; flexible width to fill bar equally.
+
+.md-tab--primary {
+  min-width:  5.5rem;      // 90px
+  height:     4rem;        // 64px with icon, 48px text-only
+  padding:    0.75rem 1rem 0.5rem;
+  flex:       1;
+
+  &:not(:has(.md-tab__icon)) {
+    height:  3rem;         // 48px — text-only primary tab
+  }
+}
+
+.md-tab__label {
+  font-family:  var(--md-sys-typescale-title-small-font);
+  font-size:    var(--md-sys-typescale-title-small-size);
+  font-weight:  var(--md-sys-typescale-title-small-weight);
+  line-height:  var(--md-sys-typescale-title-small-line-height);
+}
+
+// ─── Secondary tab ────────────────────────────────────────────────────────────
+// Compact height; auto width; label-large typography.
+
+.md-tab--secondary {
+  height:     3rem;      // 48px
+  padding:    0 1rem;
+
+  .md-tab__label {
+    font-family:  var(--md-sys-typescale-label-large-font);
+    font-size:    var(--md-sys-typescale-label-large-size);
+    font-weight:  var(--md-sys-typescale-label-large-weight);
+    line-height:  var(--md-sys-typescale-label-large-line-height);
+  }
+}

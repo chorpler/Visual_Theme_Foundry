@@ -1,0 +1,155 @@
+// components/_fab.scss — MD3 Floating Action Button
+// ─────────────────────────────────────────────────────────────────────────────
+// FAB, small FAB, and large FAB variants. Extended FAB (with label) is also
+// included. Tertiary-container color is the MD3 default.
+//
+// ─── Markup — Standard FAB ────────────────────────────────────────────────────
+//   <button class="md-fab" aria-label="Add item">
+//     <span class="md-fab__icon" aria-hidden="true">add</span>
+//   </button>
+//
+// ─── Markup — Small / Large ───────────────────────────────────────────────────
+//   <button class="md-fab md-fab--small" aria-label="Compose">
+//     <span class="md-fab__icon" aria-hidden="true">edit</span>
+//   </button>
+//
+//   <button class="md-fab md-fab--large" aria-label="Navigate up">
+//     <span class="md-fab__icon" aria-hidden="true">north</span>
+//   </button>
+//
+// ─── Markup — Extended FAB ────────────────────────────────────────────────────
+//   <button class="md-fab md-fab--extended">
+//     <span class="md-fab__icon" aria-hidden="true">navigation</span>
+//     Navigate
+//   </button>
+//
+// ─── Color variants ───────────────────────────────────────────────────────────
+//   Default: tertiary container (recommended for single, primary FAB)
+//   Primary: --md-fab-primary
+//   Secondary: --md-fab-secondary
+//   Surface: --md-fab-surface
+//
+//   <button class="md-fab md-fab--primary" aria-label="...">
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-tertiary-container / on-tertiary-container
+//   --md-sys-color-primary-container / on-primary-container
+//   --md-sys-color-secondary-container / on-secondary-container
+//   --md-sys-color-surface-container-high / primary
+//   --md-sys-shape-corner-large / corner-extra-large
+//   --md-sys-elevation-level3
+//   --md-sys-typescale-label-large-*
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+
+.md-fab {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.75rem;
+  width:           3.5rem;       // 56px — standard FAB
+  height:          3.5rem;
+  border-radius:   var(--md-sys-shape-corner-large);
+  border:          none;
+  background:      var(--md-sys-color-tertiary-container);
+  color:           var(--md-sys-color-on-tertiary-container);
+  box-shadow:      var(--md-sys-elevation-level3);
+  cursor:          pointer;
+  position:        relative;
+  overflow:        hidden;
+  outline:         none;
+  font-family:     var(--md-sys-typescale-label-large-font);
+  font-size:       var(--md-sys-typescale-label-large-size);
+  font-weight:     var(--md-sys-typescale-label-large-weight);
+  line-height:     var(--md-sys-typescale-label-large-line-height);
+  transition:      box-shadow var(--md-sys-motion-duration-short4)
+                              var(--md-sys-motion-easing-standard);
+
+  // State layer
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         0;
+    border-radius: inherit;
+    background:    currentColor;
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+    pointer-events:none;
+  }
+
+  &:hover {
+    box-shadow: var(--md-sys-elevation-level4, var(--md-sys-elevation-level3));
+    &::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  }
+
+  &:focus-visible {
+    box-shadow: var(--md-sys-elevation-level3);
+    &::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  }
+
+  &:active {
+    box-shadow: var(--md-sys-elevation-level3);
+    &::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+  }
+
+  &:disabled {
+    cursor:     not-allowed;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color:      color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}
+
+.md-fab__icon {
+  font-size:   1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+// ─── Small FAB ────────────────────────────────────────────────────────────────
+
+.md-fab--small {
+  width:         2.5rem;    // 40px
+  height:        2.5rem;
+  border-radius: var(--md-sys-shape-corner-medium);
+
+  .md-fab__icon { font-size: 1.5rem; }
+}
+
+// ─── Large FAB ────────────────────────────────────────────────────────────────
+
+.md-fab--large {
+  width:         6rem;      // 96px
+  height:        6rem;
+  border-radius: var(--md-sys-shape-corner-extra-large);
+
+  .md-fab__icon { font-size: 2.25rem; }
+}
+
+// ─── Extended FAB ─────────────────────────────────────────────────────────────
+
+.md-fab--extended {
+  width:        auto;
+  min-width:    5rem;
+  padding:      0 1rem;
+  border-radius:var(--md-sys-shape-corner-large);
+}
+
+// ─── Color variants ───────────────────────────────────────────────────────────
+
+.md-fab--primary {
+  background: var(--md-sys-color-primary-container);
+  color:      var(--md-sys-color-on-primary-container);
+}
+
+.md-fab--secondary {
+  background: var(--md-sys-color-secondary-container);
+  color:      var(--md-sys-color-on-secondary-container);
+}
+
+.md-fab--surface {
+  background: var(--md-sys-color-surface-container-high);
+  color:      var(--md-sys-color-primary);
+}

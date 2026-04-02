@@ -1,0 +1,21 @@
+{
+    "name": "VisualThemeFoundry",
+    "description": "Offline dependency-free web UI theming utility: visually select and customize color themes, select fonts and styles, select icon sets, view with Material Design 3 components, and export a ready-to-use theme package for use in your projects.",
+    "author": "Mike (Lead Designer) — Forge Code (Lead Programmer)",
+    "repository": "https://github.com/Hachero/Visual_Theme_Foundry",
+    "vendor": {
+        "sass": "_imports/node_modules/.bin/sass",
+        "tsc": "_imports/node_modules/.bin/tsc",
+        "sass_version": "1.98.0",
+        "typescript_version": "5.9.3"
+    },
+    "scripts": {
+        "build:ts": "node _imports/typescript/lib/tsc.js --project tsconfig.json",
+        "watch:ts": "node _imports/typescript/lib/tsc.js --project tsconfig.json --watch"
+    },
+    "notes": [
+        "Do not add dependency-manager manifest files.",
+        "Do not restore managed dependency folders; vendor approved utility sources in _imports.",
+        "Runtime remains framework-free Vanilla JavaScript generated from TypeScript sources."
+    ]
+}

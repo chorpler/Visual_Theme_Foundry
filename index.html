@@ -1,0 +1,2831 @@
+<!doctype html>
+<!--
+	Material Theme Builder — preview page.
+
+	Purpose:
+	- Load one or more material-theme-*.json files from the local Python server.
+	- Let the user choose a theme file and scheme; apply MD3 color tokens to the page in real time.
+	- Let the user choose local fonts from fonts/ and configure per-role typography.
+	- Show icon inventory from icons/ grouped by source.
+	- Preview all MD3 components rendered with class-based HTML and the compiled token CSS.
+	- Export a zip package: compiled CSS, SCSS source (token-substituted), JS behaviors, fonts, icons.
+	- No Lit runtime. No external CDN calls. No npm.
+
+	Run flow:
+	1) Start server.py (defaults to http://127.0.0.1:9000).
+	   Server compiles _export_templates/scss/theme.scss → static/css/styles.css at startup.
+	2) Open this page from the same server origin.
+	3) Select a theme file, scheme, fonts, then toggle component variants and export.
+-->
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Material Web Builder Preview</title>
+
+		<link rel="stylesheet" href="/static/css/styles.css" />
+
+		<style>
+			:root {
+				--page-bg: #f5f7fb;
+				--page-bg-alt: #f8f6ef;
+				--app-font: "Lato", sans-serif;
+				--ink: #1e1f24;
+				--panel: rgba(255, 255, 255, 0.9);
+				--border: rgba(0, 0, 0, 0.12);
+				--control-bg: rgba(255, 255, 255, 0.9);
+				--control-fg: #1e1f24;
+				--control-border: rgba(0, 0, 0, 0.2);
+				--control-active-bg: #87521a;
+				--control-active-fg: #ffffff;
+				--md-icon-font: "Lato", sans-serif;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html {
+				background-color: var(--page-bg);
+				color: var(--ink);
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: var(--app-font);
+				color: var(--ink);
+				background:
+					radial-gradient(
+						circle at 15% 15%,
+						color-mix(
+								in srgb,
+								var(--md-sys-color-primary-container, #f3eecf) 70%,
+								transparent
+							)
+							0%,
+						transparent 30%
+					),
+					radial-gradient(
+						circle at 85% 5%,
+						color-mix(
+								in srgb,
+								var(--md-sys-color-secondary-container, #d8ebff) 60%,
+								transparent
+							)
+							0%,
+						transparent 35%
+					),
+					linear-gradient(120deg, var(--page-bg), var(--page-bg-alt));
+			}
+
+			.page {
+				width: min(1420px, 100% - 2rem);
+				margin: 1rem auto 2rem;
+				display: grid;
+				grid-template-columns: 330px 1fr 240px;
+				gap: 1rem;
+			}
+
+			.panel {
+				background: var(--panel);
+				backdrop-filter: blur(6px);
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+			}
+
+			.controls {
+				padding: 1rem;
+				position: sticky;
+				top: 1rem;
+				align-self: start;
+				max-height: calc(100vh - 2rem);
+				overflow: auto;
+			}
+
+			.preview {
+				padding: 1rem;
+				min-width: 0;
+			}
+
+			.quick-nav {
+				padding: 0.9rem;
+				position: sticky;
+				top: 1rem;
+				align-self: start;
+				max-height: calc(100vh - 2rem);
+				overflow: auto;
+			}
+
+			.title {
+				margin: 0 0 0.25rem;
+			}
+
+			.subtle {
+				margin: 0.25rem 0 1rem;
+				font-size: 0.9rem;
+				opacity: 0.75;
+			}
+
+			.row {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				margin: 0.35rem 0;
+			}
+
+			input[type="checkbox"] {
+				accent-color: var(--md-sys-color-primary, #87521a);
+			}
+
+			.theme-picker {
+				margin-bottom: 1rem;
+			}
+
+			.font-picker {
+				margin-bottom: 1rem;
+			}
+
+			.icon-picker {
+				margin-bottom: 1rem;
+			}
+
+			select {
+				width: 100%;
+				margin-top: 0.35rem;
+				padding: 0.5rem;
+				border: 1px solid var(--control-border);
+				border-radius: 8px;
+				background: var(--control-bg);
+				color: var(--control-fg);
+				font: inherit;
+			}
+
+			.scheme-buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-top: 0.5rem;
+			}
+
+			.scheme-button {
+				border: 1px solid var(--control-border);
+				background: var(--control-bg);
+				color: var(--control-fg);
+				border-radius: 999px;
+				padding: 0.35rem 0.75rem;
+				cursor: pointer;
+				font: inherit;
+			}
+
+			.scheme-button.active {
+				border-color: var(--control-active-bg);
+				background: var(--control-active-bg);
+				color: var(--control-active-fg);
+			}
+
+			.component-block {
+				padding: 0.25rem 0 0.75rem;
+			}
+
+			.component-label {
+				font-weight: 700;
+				margin-right: 0.35rem;
+			}
+
+			.variant-row {
+				display: grid;
+				grid-template-columns: 210px 1fr;
+				gap: 1rem;
+				align-items: center;
+				margin: 0.5rem 0;
+			}
+
+			.variant-demo {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.6rem;
+				align-items: center;
+			}
+
+			hr {
+				border: 0;
+				border-top: 1px solid var(--border);
+				margin: 0.75rem 0 1rem;
+			}
+
+			.status {
+				font-size: 0.9rem;
+				opacity: 0.8;
+				margin: 0.3rem 0 0;
+			}
+
+			.status.error {
+				opacity: 1;
+				color: var(--md-sys-color-error, #b3261e);
+			}
+
+			.icon-preview-list {
+				margin: 0.45rem 0 0;
+				padding-left: 1rem;
+				font-size: 0.85rem;
+				opacity: 0.8;
+				max-height: 8rem;
+				overflow: auto;
+			}
+
+			.icon-preview-list li {
+				margin-bottom: 0.2rem;
+			}
+
+			.typography-studio {
+				padding: 0.8rem;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				margin-bottom: 1rem;
+				background: color-mix(in srgb, var(--panel) 82%, transparent);
+			}
+
+			.typography-controls {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 0.75rem;
+				margin-bottom: 0.8rem;
+			}
+
+			.typography-cards {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+				gap: 0.7rem;
+			}
+
+			.font-style-card {
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				padding: 0.65rem;
+				background: color-mix(in srgb, var(--control-bg) 92%, transparent);
+			}
+
+			.font-style-title {
+				margin: 0 0 0.4rem;
+				font-size: 0.95rem;
+				font-weight: 700;
+			}
+
+			.weight-grid {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 0.25rem;
+				margin-top: 0.35rem;
+			}
+
+			.weight-option {
+				display: flex;
+				align-items: center;
+				gap: 0.3rem;
+				font-size: 0.8rem;
+			}
+
+			.weight-option input:disabled + span {
+				opacity: 0.45;
+			}
+
+			.switch-row {
+				display: flex;
+				align-items: center;
+				gap: 0.45rem;
+				margin-top: 0.3rem;
+				font-size: 0.85rem;
+			}
+
+			.token-note {
+				font-size: 0.76rem;
+				opacity: 0.78;
+				margin-top: 0.3rem;
+			}
+
+			.card-preview {
+				border: 1px solid var(--control-border);
+				border-radius: 8px;
+				padding: 0.45rem;
+				margin-top: 0.45rem;
+			}
+
+			.export-row {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+				margin-top: 0.8rem;
+			}
+
+			.export-hint {
+				font-size: 0.85rem;
+				opacity: 0.85;
+			}
+
+			.component-jump-list {
+				display: flex;
+				flex-direction: column;
+				gap: 0.35rem;
+				margin-top: 0.5rem;
+			}
+
+			.component-jump-link {
+				display: block;
+				padding: 0.35rem 0.55rem;
+				border: 1px solid var(--control-border);
+				border-radius: 9px;
+				background: var(--control-bg);
+				color: var(--control-fg);
+				text-decoration: none;
+				font-size: 0.87rem;
+			}
+
+			.component-jump-link:hover,
+			.component-jump-link:focus-visible {
+				outline: none;
+				border-color: var(--control-active-bg);
+				background: color-mix(
+					in srgb,
+					var(--control-active-bg) 22%,
+					var(--control-bg)
+				);
+			}
+
+			.variant-name {
+				font-size: 0.95rem;
+			}
+
+			.variant-demo.wide {
+				min-width: 260px;
+			}
+
+			@media (max-width: 1260px) {
+				.page {
+					grid-template-columns: 330px 1fr;
+				}
+
+				.quick-nav {
+					display: none;
+				}
+			}
+
+			@media (max-width: 900px) {
+				.page {
+					grid-template-columns: 1fr;
+				}
+
+				.controls {
+					position: static;
+					max-height: none;
+				}
+
+				.variant-row {
+					grid-template-columns: 1fr;
+					gap: 0.35rem;
+				}
+			}
+
+			:root.theme-loaded {
+				--page-bg: var(--md-sys-color-background, #f5f7fb);
+				--page-bg-alt: color-mix(
+					in srgb,
+					var(--md-sys-color-surface, #f8f6ef) 85%,
+					var(--md-sys-color-background, #f5f7fb)
+				);
+				--ink: var(--md-sys-color-on-background, #1e1f24);
+				--panel: color-mix(
+					in srgb,
+					var(--md-sys-color-surface, #ffffff) 86%,
+					transparent
+				);
+				--border: color-mix(
+					in srgb,
+					var(--md-sys-color-outline, rgba(0, 0, 0, 0.12)) 58%,
+					transparent
+				);
+				--control-bg: color-mix(
+					in srgb,
+					var(
+							--md-sys-color-surface-container,
+							var(--md-sys-color-surface, #fff)
+						)
+						85%,
+					transparent
+				);
+				--control-fg: var(--md-sys-color-on-surface, #1e1f24);
+				--control-border: color-mix(
+					in srgb,
+					var(--md-sys-color-outline, rgba(0, 0, 0, 0.2)) 70%,
+					transparent
+				);
+				--control-active-bg: var(--md-sys-color-primary, #87521a);
+				--control-active-fg: var(--md-sys-color-on-primary, #ffffff);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="page">
+			<aside class="panel controls">
+				<h1 class="title md-typescale-headline-small">Theme + Variants</h1>
+				<p class="subtle">
+					Select a theme file, then pick a scheme. Toggle components and
+					variants as needed.
+				</p>
+
+				<div class="theme-picker">
+					<label for="theme-file-select" class="md-typescale-title-small"
+						>Color Theme JSON</label
+					>
+					<select id="theme-file-select" disabled></select>
+					<div id="theme-status" class="status" aria-live="polite"></div>
+					<div id="scheme-buttons" class="scheme-buttons"></div>
+				</div>
+
+				<div class="font-picker">
+					<label for="font-select" class="md-typescale-title-small"
+						>Font Selection</label
+					>
+					<select id="font-select" disabled></select>
+					<div id="font-status" class="status" aria-live="polite"></div>
+				</div>
+
+				<p class="status">
+					Use the checkboxes in each component section to show/hide variants.
+				</p>
+			</aside>
+
+			<main class="panel preview">
+				<section class="numeric-features-card" id="numeric-features">
+					<h2 class="md-typescale-title-large" style="margin: 0 0 0.25rem">Numeric Features</h2>
+					<p class="subtle" style="margin-top: 0">OpenType <code>font-variant-numeric</code> classes. Toggle to preview — active selections are included in the SCSS export.</p>
+
+					<div class="numeric-feature-row numeric-feature-row--normal">
+						<span class="numeric-feature-label md-typescale-label-medium">Normal</span>
+						<span class="numeric-preview">0 1 2 3 4 5 6 7 8 9</span>
+					</div>
+
+					<div class="numeric-feature-row" data-feature="tabular">
+						<label class="row">
+							<input type="checkbox" class="md-checkbox nf-checkbox" id="nf-tabular"
+								data-class="md-numeric--tabular" data-preview="tabular" />
+							<span class="numeric-feature-label md-typescale-label-medium">tabular-nums</span>
+						</label>
+						<span class="numeric-preview" data-preview="tabular">0 1 2 3 4 5 6 7 8 9</span>
+					</div>
+
+					<div class="numeric-feature-row" data-feature="oldstyle">
+						<label class="row">
+							<input type="checkbox" class="md-checkbox nf-checkbox" id="nf-oldstyle"
+								data-class="md-numeric--oldstyle" data-preview="oldstyle" />
+							<span class="numeric-feature-label md-typescale-label-medium">oldstyle-nums</span>
+						</label>
+						<span class="numeric-preview" data-preview="oldstyle">0 1 2 3 4 5 6 7 8 9</span>
+					</div>
+
+					<div class="numeric-feature-row" data-feature="tabular-oldstyle">
+						<label class="row">
+							<input type="checkbox" class="md-checkbox nf-checkbox" id="nf-tabular-oldstyle"
+								data-class="md-numeric--tabular-oldstyle" data-preview="tabular-oldstyle" />
+							<span class="numeric-feature-label md-typescale-label-medium">tabular-nums + oldstyle-nums</span>
+						</label>
+						<span class="numeric-preview" data-preview="tabular-oldstyle">0 1 2 3 4 5 6 7 8 9</span>
+					</div>
+
+					<div class="numeric-feature-row" data-feature="fractions">
+						<label class="row">
+							<input type="checkbox" class="md-checkbox nf-checkbox" id="nf-fractions"
+								data-class="md-numeric--fractions" data-preview="fractions" />
+							<span class="numeric-feature-label md-typescale-label-medium">diagonal-fractions</span>
+						</label>
+						<span class="numeric-preview" data-preview="fractions">1/2 &nbsp; 3/4 &nbsp; 5/6 &nbsp; 7/8</span>
+					</div>
+
+					<div class="numeric-feature-row" data-feature="ordinal">
+						<label class="row">
+							<input type="checkbox" class="md-checkbox nf-checkbox" id="nf-ordinal"
+								data-class="md-numeric--ordinal" data-preview="ordinal" />
+							<span class="numeric-feature-label md-typescale-label-medium">ordinal</span>
+						</label>
+						<span class="numeric-preview" data-preview="ordinal">1st &nbsp; 2nd &nbsp; 3rd &nbsp; 4th</span>
+					</div>
+
+					<!-- Shown only when tabular-nums is checked -->
+					<div class="numeric-currency-note" id="numeric-currency-note" hidden>
+						<span class="numeric-currency-label md-typescale-label-small">
+							<strong>.md-currency</strong> included in export<br />
+							<span style="opacity: 0.7">lining-nums + tabular-nums — aligns currency columns</span>
+						</span>
+						<span class="numeric-preview md-currency">$1,234.56 &nbsp; &euro;2,890.00 &nbsp; &yen;45,678</span>
+					</div>
+				</section>
+
+				<section class="typography-studio" id="typography-studio">
+					<h2 class="md-typescale-title-large" style="margin: 0 0 0.4rem">
+						Typography Studio
+					</h2>
+					<p class="subtle" style="margin-top: 0">
+						Per-style cards: semantic + material type roles. Export includes
+						JSON, Sass API, utility classes, selected fonts, selected icons, and
+						active color theme.
+					</p>
+					<div class="typography-controls">
+						<div>
+							<label for="typography-base-size" class="md-typescale-title-small"
+								>Default Font Size (px)</label
+							>
+							<input
+								id="typography-base-size"
+								type="number"
+								value="16"
+								min="10"
+								max="40"
+								step="1"
+								style="width: 100%; margin-top: 0.35rem"
+							/>
+						</div>
+						<div>
+							<label
+								for="responsive-mode-select"
+								class="md-typescale-title-small"
+								>Responsive Mode</label
+							>
+							<select id="responsive-mode-select">
+								<option value="clamp">Clamp-Based</option>
+								<option value="breakpoints">Breakpoint Presets</option>
+								<option value="both" selected>Both</option>
+							</select>
+						</div>
+						<div>
+							<label for="icon-export-source" class="md-typescale-title-small"
+								>Icon Export Source</label
+							>
+							<select id="icon-export-source"></select>
+						</div>
+					</div>
+
+					<div class="typography-controls" id="line-height-groups"></div>
+					<div class="typography-cards" id="font-style-cards"></div>
+
+					<div class="export-row">
+						<button class="md-btn md-btn--filled" id="export-theme-package-button">
+							<span class="btn-label">Export Theme Package</span>
+							<span class="btn-spinner" aria-hidden="true">
+								<div class="md-progress-circular md-progress-circular--indeterminate">
+									<svg viewBox="0 0 48 48" class="md-progress-circular__svg">
+										<circle class="md-progress-circular__track" cx="24" cy="24" r="20" />
+										<circle class="md-progress-circular__indicator" cx="24" cy="24" r="20" />
+									</svg>
+								</div>
+							</span>
+						</button>
+						<span id="export-status" class="export-hint">Ready to export.</span>
+					</div>
+				</section>
+
+				<section class="component-block" data-component="buttons">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Buttons</span>
+					</div>
+
+					<div class="variant-row" data-variant="filled">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Filled</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-btn md-btn--filled">Filled</button>
+							<button class="md-btn md-btn--filled" disabled>Disabled</button>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="outlined">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Outlined</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-btn md-btn--outlined">Outlined</button>
+							<button class="md-btn md-btn--outlined" disabled>Disabled</button>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="text">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Text</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-btn md-btn--text">Text</button>
+							<button class="md-btn md-btn--text" disabled>Disabled</button>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="icon-buttons">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Icon Buttons</span>
+					</div>
+
+					<div class="variant-row" data-variant="standard">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Standard</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-icon-btn" aria-label="Search">
+								<span class="md-icon" style="--icon-src: url('/icons/search-outline.svg')" aria-hidden="true"></span>
+							</button>
+							<button class="md-icon-btn" disabled aria-label="Search (disabled)">
+								<span class="md-icon" style="--icon-src: url('/icons/search-outline.svg')" aria-hidden="true"></span>
+							</button>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="filled">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Filled</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-icon-btn md-icon-btn--filled" aria-label="Create">
+								<span class="md-icon" style="--icon-src: url('/icons/create-outline.svg')" aria-hidden="true"></span>
+							</button>
+							<button class="md-icon-btn md-icon-btn--filled" disabled aria-label="Create (disabled)">
+								<span class="md-icon" style="--icon-src: url('/icons/create-outline.svg')" aria-hidden="true"></span>
+							</button>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="inputs">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Inputs</span>
+					</div>
+
+					<div class="variant-row" data-variant="outlined-field">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Outlined Text Field</span>
+						</label>
+						<div class="variant-demo">
+							<label class="md-textfield md-textfield--outlined">
+								<input class="md-textfield__input" type="text" placeholder=" " value="OnSiteXI" />
+								<span class="md-textfield__label">Project name</span>
+							</label>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="filled-field">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Filled Text Field</span>
+						</label>
+						<div class="variant-demo">
+							<label class="md-textfield md-textfield--filled">
+								<input class="md-textfield__input" type="text" placeholder=" " value="#CB760D" />
+								<span class="md-textfield__label">Primary color</span>
+								<span class="md-textfield__indicator"></span>
+							</label>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="checkbox-radio-switch">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Checkbox / Radio / Switch</span>
+						</label>
+						<div class="variant-demo">
+							<input type="checkbox" class="md-checkbox" checked />
+							<input type="radio" class="md-radio" name="demo-radio" checked />
+							<input type="checkbox" class="md-switch" role="switch" checked />
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="chips">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Chips</span>
+					</div>
+
+					<div class="variant-row" data-variant="assist-chip">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Assist / Suggestion</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-chip md-chip--assist">Assist</button>
+							<button class="md-chip md-chip--suggestion">Suggestion</button>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="filter-chip">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Filter</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-chip md-chip--filter md-chip--selected">Filter</button>
+							<button class="md-chip md-chip--filter">Filter off</button>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="progress">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Progress + Slider</span>
+					</div>
+
+					<div class="variant-row" data-variant="circular-linear">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Circular + Linear</span>
+						</label>
+						<div class="variant-demo">
+							<div class="md-progress-circular" role="progressbar"
+								aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"
+								style="--md-progress-value: 66">
+								<svg viewBox="0 0 48 48" class="md-progress-circular__svg">
+									<circle class="md-progress-circular__track" cx="24" cy="24" r="20" />
+									<circle class="md-progress-circular__indicator" cx="24" cy="24" r="20" />
+								</svg>
+							</div>
+							<div class="md-progress-circular md-progress-circular--indeterminate"
+								role="progressbar" aria-label="Loading">
+								<svg viewBox="0 0 48 48" class="md-progress-circular__svg">
+									<circle class="md-progress-circular__track" cx="24" cy="24" r="20" />
+									<circle class="md-progress-circular__indicator" cx="24" cy="24" r="20" />
+								</svg>
+							</div>
+							<div class="md-progress-linear" role="progressbar"
+								aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+								<div class="md-progress-linear__track">
+									<div class="md-progress-linear__indicator" style="width: 40%"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="slider">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Slider</span>
+						</label>
+						<div class="variant-demo wide">
+							<input type="range" min="0" max="100" value="42" style="width: 100%" />
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="fab">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Floating Action Buttons</span>
+					</div>
+
+					<div class="variant-row" data-variant="small-regular-large-extended">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name"
+								>Small / Regular / Large / Extended</span
+							>
+						</label>
+						<div class="variant-demo">
+							<button class="md-fab md-fab--small" aria-label="Add small"><span aria-hidden="true">add</span></button>
+							<button class="md-fab" aria-label="Add"><span aria-hidden="true">add</span></button>
+							<button class="md-fab md-fab--large" aria-label="Add large"><span aria-hidden="true">add</span></button>
+							<button class="md-fab md-fab--extended md-fab--tertiary"><span aria-hidden="true">edit</span>Create</button>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="tabs">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Tabs</span>
+					</div>
+
+					<div class="variant-row" data-variant="primary-secondary-tabs">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Primary + Secondary</span>
+						</label>
+						<div class="variant-demo" style="width: 100%; flex-direction: column; gap: 0.5rem">
+							<div class="md-tabs md-tabs--primary" role="tablist">
+								<button class="md-tab md-tab--primary md-tab--active" role="tab" aria-selected="true"><span class="md-tab__label">Overview</span></button>
+								<button class="md-tab md-tab--primary" role="tab" aria-selected="false"><span class="md-tab__label">Details</span></button>
+								<button class="md-tab md-tab--primary" role="tab" aria-selected="false"><span class="md-tab__label">History</span></button>
+							</div>
+							<div class="md-tabs md-tabs--secondary" role="tablist">
+								<button class="md-tab md-tab--secondary md-tab--active" role="tab" aria-selected="true">Team</button>
+								<button class="md-tab md-tab--secondary" role="tab" aria-selected="false">Assets</button>
+								<button class="md-tab md-tab--secondary" role="tab" aria-selected="false">Alerts</button>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="list-menu">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Lists + Menus</span>
+					</div>
+
+					<div class="variant-row" data-variant="list">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">List</span>
+						</label>
+						<div class="variant-demo" style="width: 100%">
+							<ul class="md-list">
+								<li class="md-list-item md-list-item--interactive">
+									<span class="md-list-item__headline">Crew Alpha</span>
+									<span class="md-list-item__supporting">3 active tasks</span>
+								</li>
+								<li class="md-list-item md-list-item--interactive">
+									<span class="md-list-item__headline">Crew Bravo</span>
+									<span class="md-list-item__supporting">1 active task</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="variant-row" data-variant="menu">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Menu</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-btn md-btn--filled" id="menu-anchor-button">Open menu</button>
+							<!-- md-menu has no template equivalent — menu popup not included in preview -->
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="dialog">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Dialog</span>
+					</div>
+
+					<div class="variant-row" data-variant="basic-dialog">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Basic Dialog</span>
+						</label>
+						<div class="variant-demo">
+							<button class="md-btn md-btn--filled" id="open-dialog-button">Open dialog</button>
+							<dialog class="md-dialog" id="demo-dialog">
+								<h2 class="md-dialog__headline">Confirm update</h2>
+								<div class="md-dialog__content">Apply updated schedule to this shift?</div>
+								<div class="md-dialog__actions">
+									<button class="md-btn md-btn--text" data-dialog-close="cancel">Cancel</button>
+									<button class="md-btn md-btn--filled" data-dialog-close="confirm">Confirm</button>
+								</div>
+							</dialog>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="divider">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Divider</span>
+					</div>
+
+					<div class="variant-row" data-variant="horizontal-vertical">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Horizontal + Vertical</span>
+						</label>
+						<div class="variant-demo">
+							<div style="width: 100%; min-width: 220px">
+								<div>Section A</div>
+								<hr class="md-divider" />
+								<div>Section B</div>
+							</div>
+							<div
+								style="
+									height: 54px;
+									display: flex;
+									align-items: center;
+									gap: 0.8rem;
+								"
+							>
+								<span>Left</span>
+								<div class="md-divider md-divider--vertical" role="separator"></div>
+								<span>Right</span>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="icons">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Icons</span>
+					</div>
+
+					<div class="variant-row" data-variant="material-icons">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">SVG Icons (project root)</span>
+						</label>
+						<div class="variant-demo" style="color: var(--md-sys-color-primary)">
+							<span class="md-icon md-icon--lg" style="--icon-src: url('/icons/home-outline.svg')" role="img" aria-label="home"></span>
+							<span class="md-icon md-icon--lg" style="--icon-src: url('/icons/settings-outline.svg')" role="img" aria-label="settings"></span>
+							<span class="md-icon md-icon--lg" style="--icon-src: url('/icons/alert-outline.svg')" role="img" aria-label="notifications"></span>
+							<span class="md-icon md-icon--lg" style="--icon-src: url('/icons/schedule.svg')" role="img" aria-label="schedule"></span>
+						</div>
+					</div>
+				</section>
+
+				<hr />
+
+				<section class="component-block" data-component="elevation">
+					<div class="row">
+						<input class="component-toggle" type="checkbox" checked />
+						<span class="component-label">Elevation Surfaces</span>
+					</div>
+
+					<div class="variant-row" data-variant="surface-levels">
+						<label class="row">
+							<input class="variant-toggle" type="checkbox" checked />
+							<span class="variant-name">Low / Medium / High</span>
+						</label>
+						<div class="variant-demo">
+							<div
+								class="panel"
+								style="
+									padding: 0.6rem;
+									box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+								"
+							>
+								Level 1
+							</div>
+							<div
+								class="panel"
+								style="
+									padding: 0.6rem;
+									box-shadow: 0 4px 8px rgba(0, 0, 0, 0.26);
+								"
+							>
+								Level 2
+							</div>
+							<div
+								class="panel"
+								style="
+									padding: 0.6rem;
+									box-shadow: 0 8px 16px rgba(0, 0, 0, 0.32);
+								"
+							>
+								Level 3
+							</div>
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<aside class="panel quick-nav">
+				<h2 class="md-typescale-title-medium" style="margin: 0 0 0.35rem">
+					Jump To
+				</h2>
+				<p class="subtle" style="margin-top: 0">Quick component navigation</p>
+				<nav id="component-nav-list" class="component-jump-list"></nav>
+			</aside>
+		</div>
+
+		<script>
+			const themeFileSelect = document.getElementById("theme-file-select");
+			const schemeButtons = document.getElementById("scheme-buttons");
+			const themeStatus = document.getElementById("theme-status");
+			const fontSelect = document.getElementById("font-select");
+			const fontStatus = document.getElementById("font-status");
+			const iconSourceSelect = document.getElementById("icon-source-select");
+			const iconStatus = document.getElementById("icon-status");
+			const iconPreviewList = document.getElementById("icon-preview-list");
+			const typographyBaseSizeInput = document.getElementById(
+				"typography-base-size",
+			);
+			const responsiveModeSelect = document.getElementById(
+				"responsive-mode-select",
+			);
+			const lineHeightGroups = document.getElementById("line-height-groups");
+			const fontStyleCards = document.getElementById("font-style-cards");
+			const iconExportSource = document.getElementById("icon-export-source");
+			const exportThemePackageButton = document.getElementById(
+				"export-theme-package-button",
+			);
+			const exportStatus = document.getElementById("export-status");
+			const componentNavList = document.getElementById("component-nav-list");
+			const DEBUG_LOGGING = 0;
+			const WEIGHT_OPTIONS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+			const COLOR_TOKEN_OPTIONS = [
+				"--md-sys-color-on-surface",
+				"--md-sys-color-on-surface-variant",
+				"--md-sys-color-primary",
+				"--md-sys-color-secondary",
+				"--md-sys-color-tertiary",
+				"--md-sys-color-on-primary-container",
+				"--md-sys-color-on-secondary-container",
+				"--md-sys-color-outline",
+				"--md-sys-color-error",
+			];
+			const TYPOGRAPHY_ROLE_DEFINITIONS = [
+				{
+					id: "display-large",
+					label: "Display Large",
+					scale: 3.56,
+					defaultWeight: 400,
+					trackingEm: -0.02,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Display large sample",
+				},
+				{
+					id: "display-medium",
+					label: "Display Medium",
+					scale: 2.82,
+					defaultWeight: 400,
+					trackingEm: -0.01,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Display medium sample",
+				},
+				{
+					id: "display-small",
+					label: "Display Small",
+					scale: 2.25,
+					defaultWeight: 400,
+					trackingEm: 0,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Display small sample",
+				},
+				{
+					id: "headline-large",
+					label: "Headline Large",
+					scale: 2,
+					defaultWeight: 400,
+					trackingEm: 0,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Headline large sample",
+				},
+				{
+					id: "headline-medium",
+					label: "Headline Medium",
+					scale: 1.75,
+					defaultWeight: 400,
+					trackingEm: 0,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Headline medium sample",
+				},
+				{
+					id: "headline-small",
+					label: "Headline Small",
+					scale: 1.5,
+					defaultWeight: 500,
+					trackingEm: 0,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Headline small sample",
+				},
+				{
+					id: "title-large",
+					label: "Title Large",
+					scale: 1.38,
+					defaultWeight: 500,
+					trackingEm: 0,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Title large sample",
+				},
+				{
+					id: "title-medium",
+					label: "Title Medium",
+					scale: 1,
+					defaultWeight: 500,
+					trackingEm: 0.01,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Title medium sample",
+				},
+				{
+					id: "title-small",
+					label: "Title Small",
+					scale: 0.88,
+					defaultWeight: 500,
+					trackingEm: 0.01,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Title small sample",
+				},
+				{
+					id: "body-large",
+					label: "Body Large",
+					scale: 1,
+					defaultWeight: 400,
+					trackingEm: 0.01,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-on-surface-variant",
+					previewText: "Body large sample text for readable content.",
+				},
+				{
+					id: "body-medium",
+					label: "Body Medium",
+					scale: 0.88,
+					defaultWeight: 400,
+					trackingEm: 0.015,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-on-surface-variant",
+					previewText: "Body medium sample text for readable content.",
+				},
+				{
+					id: "body-small",
+					label: "Body Small",
+					scale: 0.75,
+					defaultWeight: 400,
+					trackingEm: 0.02,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-on-surface-variant",
+					previewText: "Body small sample text for compact layouts.",
+				},
+				{
+					id: "label-large",
+					label: "Label Large",
+					scale: 0.88,
+					defaultWeight: 600,
+					trackingEm: 0.01,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-primary",
+					previewText: "Label large",
+				},
+				{
+					id: "label-medium",
+					label: "Label Medium",
+					scale: 0.75,
+					defaultWeight: 600,
+					trackingEm: 0.03,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-primary",
+					previewText: "Label medium",
+				},
+				{
+					id: "label-small",
+					label: "Label Small",
+					scale: 0.69,
+					defaultWeight: 600,
+					trackingEm: 0.04,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-primary",
+					previewText: "Label small",
+				},
+				{
+					id: "hero-title",
+					label: "Hero Title (Semantic)",
+					scale: 3.12,
+					defaultWeight: 700,
+					trackingEm: -0.02,
+					lineHeightGroup: "display-headline",
+					colorToken: "--md-sys-color-primary",
+					previewText: "Hero title for flagship surfaces",
+				},
+				{
+					id: "section-heading",
+					label: "Section Heading (Semantic)",
+					scale: 1.5,
+					defaultWeight: 600,
+					trackingEm: 0,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Section heading",
+				},
+				{
+					id: "card-heading",
+					label: "Card Heading (Semantic)",
+					scale: 1.13,
+					defaultWeight: 600,
+					trackingEm: 0,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-on-surface",
+					previewText: "Card heading",
+				},
+				{
+					id: "body-copy",
+					label: "Body Copy (Semantic)",
+					scale: 1,
+					defaultWeight: 400,
+					trackingEm: 0.01,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-on-surface-variant",
+					previewText: "Body copy for long-form content blocks.",
+				},
+				{
+					id: "small-print",
+					label: "Small Print (Semantic)",
+					scale: 0.75,
+					defaultWeight: 400,
+					trackingEm: 0.02,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-outline",
+					previewText: "Small print and support details.",
+				},
+				{
+					id: "button-text",
+					label: "Button Text (Semantic)",
+					scale: 0.88,
+					defaultWeight: 600,
+					trackingEm: 0.02,
+					lineHeightGroup: "title-label",
+					colorToken: "--md-sys-color-on-primary-container",
+					previewText: "Button text",
+				},
+				{
+					id: "caption-note",
+					label: "Caption Note (Semantic)",
+					scale: 0.75,
+					defaultWeight: 500,
+					trackingEm: 0.03,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-secondary",
+					previewText: "Caption note",
+				},
+			];
+			const LINE_HEIGHT_GROUPS = [
+				{
+					id: "display-headline",
+					label: "Display + Headline",
+					defaultMultiplier: 1.08,
+				},
+				{
+					id: "title-label",
+					label: "Title + Label",
+					defaultMultiplier: 1.24,
+				},
+				{
+					id: "body-semantic",
+					label: "Body + Semantic",
+					defaultMultiplier: 1.45,
+				},
+			];
+
+			let loadedTheme = null;
+			let iconFiles = [];
+			let fontFamilyCatalog = [];
+			let fontItemCatalog = [];
+			const fontFamilyByKey = new Map();
+			const fontWeightFileByFamilyKey = new Map();
+			const typographyRoleState = new Map();
+			const lineHeightGroupState = new Map(
+				LINE_HEIGHT_GROUPS.map((group) => [group.id, group.defaultMultiplier]),
+			);
+			let typographyEventsBound = false;
+			const loadedFontFamilies = new Map();
+
+			/**
+			 * Write debug output when DEBUG_LOGGING is enabled.
+			 * @param {...unknown} values Values to print in console.debug.
+			 * @returns {void}
+			 * @example
+			 * logDebug("loaded", "material-theme-OnSiteXI.json");
+			 */
+			function logDebug(...values) {
+				if (!DEBUG_LOGGING) {
+					return;
+				}
+				console.debug("[material-web-builder]", ...values);
+			}
+
+			/**
+			 * Update status text below the theme selector.
+			 * @param {string} message Human-readable status message.
+			 * @param {boolean} [isError=false] Whether to style as an error state.
+			 * @returns {void}
+			 * @example
+			 * setStatus("Loaded material-theme-OnSiteXI.json");
+			 */
+			function setStatus(message, isError = false) {
+				themeStatus.textContent = message;
+				themeStatus.classList.toggle("error", isError);
+			}
+
+			/**
+			 * Update font selector status text.
+			 * @param {string} message Human-readable status text.
+			 * @param {boolean} [isError=false] Whether to render the status as error.
+			 * @returns {void}
+			 * @example
+			 * setFontStatus("Loaded 4 local fonts");
+			 */
+			function setFontStatus(message, isError = false) {
+				fontStatus.textContent = message;
+				fontStatus.classList.toggle("error", isError);
+			}
+
+			/**
+			 * Update icon selector status text.
+			 * @param {string} message Human-readable status text.
+			 * @param {boolean} [isError=false] Whether to render the status as error.
+			 * @returns {void}
+			 * @example
+			 * setIconStatus("Detected 300 icons");
+			 */
+			function setIconStatus(message, isError = false) {
+				iconStatus.textContent = message;
+				iconStatus.classList.toggle("error", isError);
+			}
+
+			setStatus("Loading themes...");
+			setFontStatus("Loading fonts...");
+			setIconStatus("Loading icon inventory...");
+
+			/**
+			 * Build a readable display name from a file path.
+			 * @param {string} filePath Relative file path.
+			 * @returns {string} Base name with extension removed.
+			 * @example
+			 * getBaseName("YuGothR.ttc");
+			 */
+			function getBaseName(filePath) {
+				const fileName = filePath.split("/").pop() || filePath;
+				return fileName.replace(/\.[^.]+$/, "");
+			}
+
+			/**
+			 * Generate a stable CSS font-family label from a font file path.
+			 * @param {string} fontFileName Font file path under fonts/.
+			 * @returns {string} Generated family label.
+			 * @example
+			 * buildFontFamilyName("YuGothR.ttc");
+			 */
+			function buildFontFamilyName(fontFileName) {
+				return `Local-${getBaseName(fontFileName).replace(/[^a-zA-Z0-9_-]+/g, "-")}`;
+			}
+
+			/**
+			 * Clamp and normalize a number.
+			 * @param {number} value Input number.
+			 * @param {number} minimum Minimum value.
+			 * @param {number} maximum Maximum value.
+			 * @returns {number} Clamped number.
+			 * @example
+			 * clampNumber(45, 10, 40);
+			 */
+			function clampNumber(value, minimum, maximum) {
+				if (!Number.isFinite(value)) {
+					return minimum;
+				}
+				return Math.min(maximum, Math.max(minimum, value));
+			}
+
+			/**
+			 * Round a number to a fixed precision.
+			 * @param {number} value Numeric value.
+			 * @param {number} digits Decimal precision.
+			 * @returns {number} Rounded number.
+			 * @example
+			 * roundNumber(1.23456, 2);
+			 */
+			function roundNumber(value, digits = 3) {
+				const factor = 10 ** digits;
+				return Math.round(value * factor) / factor;
+			}
+
+			/**
+			 * Convert camelCase token names to kebab-case CSS variable suffixes.
+			 * @param {string} value Token name in camelCase.
+			 * @returns {string} Token name transformed to kebab-case.
+			 * @example
+			 * camelToKebab("onPrimaryContainer")
+			 */
+			function camelToKebab(value) {
+				return value.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+			}
+
+			/**
+			 * Apply a selected scheme from the loaded theme to page CSS variables.
+			 * @param {string} schemeName Theme scheme key (for example "light").
+			 * @returns {void}
+			 * @example
+			 * applyScheme("dark-high-contrast");
+			 */
+			function applyScheme(schemeName) {
+				if (
+					!loadedTheme ||
+					!loadedTheme.schemes ||
+					!loadedTheme.schemes[schemeName]
+				) {
+					return;
+				}
+
+				const scheme = loadedTheme.schemes[schemeName];
+				const root = document.documentElement;
+				logDebug("Applying scheme", schemeName);
+
+				Object.entries(scheme).forEach(([tokenName, tokenValue]) => {
+					root.style.setProperty(
+						`--md-sys-color-${camelToKebab(tokenName)}`,
+						tokenValue,
+					);
+				});
+
+				root.classList.add("theme-loaded");
+
+				document.querySelectorAll(".scheme-button").forEach((button) => {
+					button.classList.toggle(
+						"active",
+						button.dataset.scheme === schemeName,
+					);
+				});
+
+				const isDark = schemeName.startsWith("dark");
+				document.body.style.colorScheme = isDark ? "dark" : "light";
+			}
+
+			/**
+			 * Apply the selected local font to the page.
+			 * @param {string} fontFileName Font file name from fonts/ or empty for default.
+			 * @returns {Promise<void>}
+			 * @example
+			 * await applyFontSelection("YuGothR.ttc");
+			 */
+			async function applyFontSelection(fontFileName) {
+				if (!fontFileName) {
+					document.documentElement.style.setProperty(
+						"--app-font",
+						'"Lato", sans-serif',
+					);
+					setFontStatus("Using Lato (default)");
+					return;
+				}
+
+				const familyName = await ensureFontFileLoaded(fontFileName);
+
+				document.documentElement.style.setProperty(
+					"--app-font",
+					`"${familyName}", "Lato", sans-serif`,
+				);
+				setFontStatus(`Using ${getBaseName(fontFileName)}`);
+			}
+
+			/**
+			 * Ensure one local font file is loaded via FontFace API.
+			 * @param {string} fontFileName Font file name under fonts/.
+			 * @returns {Promise<string>} Loaded runtime family name.
+			 * @example
+			 * await ensureFontFileLoaded("YuGothR.ttc");
+			 */
+			async function ensureFontFileLoaded(fontFileName) {
+				if (loadedFontFamilies.has(fontFileName)) {
+					return loadedFontFamilies.get(fontFileName);
+				}
+
+				const familyName = buildFontFamilyName(fontFileName);
+				const fontUrl = `/fonts/${encodeURIComponent(fontFileName)}`;
+				const fontFace = new FontFace(familyName, `url(${fontUrl})`);
+				await fontFace.load();
+				document.fonts.add(fontFace);
+				loadedFontFamilies.set(fontFileName, familyName);
+				logDebug("Loaded font", fontFileName, familyName);
+				return familyName;
+			}
+
+			/**
+			 * Load available local fonts and initialize the font selector.
+			 * @returns {Promise<void>}
+			 * @example
+			 * await loadFontFiles();
+			 */
+			async function loadFontFiles() {
+				const response = await fetch("/api/fonts");
+				if (!response.ok) {
+					throw new Error("Unable to load local fonts");
+				}
+
+				const payload = await response.json();
+				const fontFiles = payload.font_files || [];
+				fontItemCatalog = payload.font_items || [];
+				fontFamilyCatalog = payload.font_families || [];
+				fontFamilyByKey.clear();
+				fontFamilyCatalog.forEach((family) => {
+					fontFamilyByKey.set(family.family_key, family);
+				});
+				rebuildFontWeightFileIndex(fontItemCatalog);
+				fontSelect.innerHTML = "";
+				fontSelect.disabled = false;
+
+				const defaultOption = document.createElement("option");
+				defaultOption.value = "";
+				defaultOption.textContent = "Lato (default)";
+				fontSelect.appendChild(defaultOption);
+
+				fontFiles.forEach((fontFileName) => {
+					const option = document.createElement("option");
+					option.value = fontFileName;
+					option.textContent = getBaseName(fontFileName);
+					fontSelect.appendChild(option);
+				});
+
+				if (fontFiles.length === 0) {
+					setFontStatus("No local font files found in fonts/");
+					initializeTypographyStudio();
+					return;
+				}
+
+				setFontStatus(`Detected ${fontFiles.length} local font file(s)`);
+				initializeTypographyStudio();
+			}
+
+			/**
+			 * Render a small icon filename preview for a selected source group.
+			 * @param {string} sourceName Source group key, or "all".
+			 * @returns {void}
+			 * @example
+			 * renderIconPreview("ionicons-svg");
+			 */
+			function renderIconPreview(sourceName) {
+				if (!iconPreviewList) {
+					return;
+				}
+
+				iconPreviewList.innerHTML = "";
+
+				let filteredIcons = iconFiles;
+				if (sourceName === "root") {
+					filteredIcons = iconFiles.filter(
+						(filePath) => !filePath.includes("/"),
+					);
+				} else if (sourceName !== "all") {
+					filteredIcons = iconFiles.filter((filePath) =>
+						filePath.startsWith(`${sourceName}/`),
+					);
+				}
+
+				filteredIcons.slice(0, 12).forEach((filePath) => {
+					const item = document.createElement("li");
+					item.textContent = filePath;
+					iconPreviewList.appendChild(item);
+				});
+			}
+
+			/**
+			 * Load icon inventory and initialize source selector.
+			 * @returns {Promise<void>}
+			 * @example
+			 * await loadIconInventory();
+			 */
+			async function loadIconInventory() {
+				const response = await fetch("/api/icons");
+				if (!response.ok) {
+					throw new Error("Unable to load icon inventory");
+				}
+
+				const payload = await response.json();
+				const iconSources = payload.icon_sources || [];
+				iconFiles = payload.icon_files || [];
+
+				if (iconExportSource) {
+					iconExportSource.innerHTML = "";
+					const exportAllOption = document.createElement("option");
+					exportAllOption.value = "all";
+					exportAllOption.textContent = `All sources (${iconFiles.length})`;
+					iconExportSource.appendChild(exportAllOption);
+
+					iconSources.forEach((sourceInfo) => {
+						const option = document.createElement("option");
+						option.value = sourceInfo.source;
+						option.textContent = `${sourceInfo.source} (${sourceInfo.count})`;
+						iconExportSource.appendChild(option);
+					});
+				}
+
+				if (iconFiles.length === 0) {
+					setIconStatus("No icon files found in icons/");
+					if (iconExportSource) {
+						iconExportSource.innerHTML = "";
+						const noneOption = document.createElement("option");
+						noneOption.value = "all";
+						noneOption.textContent = "No icon files available";
+						iconExportSource.appendChild(noneOption);
+					}
+					return;
+				}
+
+				setIconStatus(
+					`Detected ${iconFiles.length} icons across ${iconSources.length} source group(s).`,
+				);
+				renderIconPreview("all");
+			}
+
+			/**
+			 * Return font family options for typography card selectors.
+			 * @returns {Array<{key: string, label: string, files: string[], weights: number[]}>} Font family options.
+			 * @example
+			 * getTypographyFamilyOptions();
+			 */
+			function getTypographyFamilyOptions() {
+				const defaultFamily = {
+					key: "__default__",
+					label: "Lato (default)",
+					files: [],
+					weights: [100, 300, 400, 700, 900],
+				};
+
+				const customFamilies = fontFamilyCatalog.map((family) => ({
+					key: family.family_key,
+					label: family.display_name,
+					files: family.files || [],
+					weights: family.available_weights || [400],
+				}));
+
+				return [defaultFamily, ...customFamilies];
+			}
+
+			/**
+			 * Build index of family+weight to font files from API payload.
+			 * @param {Array<{file_name: string, family_key: string, inferred_weight: number}>} fontItems Font file metadata.
+			 * @returns {void}
+			 * @example
+			 * rebuildFontWeightFileIndex(fontItemCatalog);
+			 */
+			function rebuildFontWeightFileIndex(fontItems) {
+				fontWeightFileByFamilyKey.clear();
+
+				fontItems.forEach((item) => {
+					const familyKey = String(item.family_key || "");
+					const weight = Number(item.inferred_weight || 400);
+					const fileName = String(item.file_name || "");
+					if (!familyKey || !fileName) {
+						return;
+					}
+
+					const key = `${familyKey}:${weight}`;
+					if (!fontWeightFileByFamilyKey.has(key)) {
+						fontWeightFileByFamilyKey.set(key, []);
+					}
+					fontWeightFileByFamilyKey.get(key).push(fileName);
+				});
+			}
+
+			/**
+			 * Resolve a font file for a selected family and desired weight.
+			 * @param {string} familyKey Selected family key.
+			 * @param {number} preferredWeight Desired weight.
+			 * @returns {string|null} Matching font file or null when unavailable.
+			 * @example
+			 * getFontFileForFamilyWeight("yu-goth", 700);
+			 */
+			function getFontFileForFamilyWeight(familyKey, preferredWeight) {
+				if (familyKey === "__default__") {
+					return null;
+				}
+
+				const availableWeights = getAvailableWeightsForFamily(familyKey);
+				const chosenWeight = pickNearestWeight(
+					availableWeights,
+					preferredWeight,
+				);
+				const exactKey = `${familyKey}:${chosenWeight}`;
+				const exactFiles = fontWeightFileByFamilyKey.get(exactKey) || [];
+				if (exactFiles.length > 0) {
+					return exactFiles[0];
+				}
+
+				const family = fontFamilyByKey.get(familyKey);
+				if (family && Array.isArray(family.files) && family.files.length > 0) {
+					return family.files[0];
+				}
+
+				return null;
+			}
+
+			/**
+			 * Return available CSS weights for a selected family key.
+			 * @param {string} familyKey Family key in typography state.
+			 * @returns {number[]} Sorted available weights.
+			 * @example
+			 * getAvailableWeightsForFamily("__default__");
+			 */
+			function getAvailableWeightsForFamily(familyKey) {
+				const selectedFamily = getTypographyFamilyOptions().find(
+					(family) => family.key === familyKey,
+				);
+				if (!selectedFamily) {
+					return [400];
+				}
+
+				return selectedFamily.weights.slice().sort((a, b) => a - b);
+			}
+
+			/**
+			 * Pick the nearest available weight to a preferred weight.
+			 * @param {number[]} availableWeights Available weight numbers.
+			 * @param {number} preferredWeight Desired weight.
+			 * @returns {number} Chosen available weight.
+			 * @example
+			 * pickNearestWeight([400, 700], 600);
+			 */
+			function pickNearestWeight(availableWeights, preferredWeight) {
+				if (availableWeights.length === 0) {
+					return 400;
+				}
+
+				return availableWeights.reduce((best, current) => {
+					const currentDelta = Math.abs(current - preferredWeight);
+					const bestDelta = Math.abs(best - preferredWeight);
+					return currentDelta < bestDelta ? current : best;
+				}, availableWeights[0]);
+			}
+
+			/**
+			 * Build CSS font-family stack for a typography role preview.
+			 * @param {string} familyKey Selected family key.
+			 * @param {number} weight Selected font weight.
+			 * @returns {string} CSS font-family expression.
+			 * @example
+			 * getPreviewFontStack("__default__", 400);
+			 */
+			function getPreviewFontStack(familyKey, weight) {
+				if (familyKey === "__default__") {
+					return '"Lato", sans-serif';
+				}
+
+				const previewFont = getFontFileForFamilyWeight(familyKey, weight);
+				if (!previewFont) {
+					return '"Lato", sans-serif';
+				}
+				if (!loadedFontFamilies.has(previewFont)) {
+					return '"Lato", sans-serif';
+				}
+
+				const runtimeFamilyName = loadedFontFamilies.get(previewFont);
+				return `"${runtimeFamilyName}", "Lato", sans-serif`;
+			}
+
+			/**
+			 * Load preview font for a selected typography family.
+			 * @param {string} familyKey Selected family key.
+			 * @param {number} weight Selected weight.
+			 * @returns {Promise<void>}
+			 * @example
+			 * await ensurePreviewFamilyLoaded("yu-goth", 700);
+			 */
+			async function ensurePreviewFamilyLoaded(familyKey, weight) {
+				if (familyKey === "__default__") {
+					return;
+				}
+
+				const previewFont = getFontFileForFamilyWeight(familyKey, weight);
+				if (!previewFont) {
+					return;
+				}
+				await ensureFontFileLoaded(previewFont);
+			}
+
+			/**
+			 * Return the current typography base size from UI.
+			 * @returns {number} Base font size in pixels.
+			 * @example
+			 * getTypographyBaseSize();
+			 */
+			function getTypographyBaseSize() {
+				if (!typographyBaseSizeInput) {
+					return 16;
+				}
+
+				const parsed = Number(typographyBaseSizeInput.value);
+				const clamped = clampNumber(parsed, 10, 40);
+				typographyBaseSizeInput.value = String(clamped);
+				return clamped;
+			}
+
+			/**
+			 * Refresh in-memory typography role state from base scale settings.
+			 * @returns {void}
+			 * @example
+			 * syncTypographyRoleState();
+			 */
+			function syncTypographyRoleState() {
+				const baseSize = getTypographyBaseSize();
+
+				TYPOGRAPHY_ROLE_DEFINITIONS.forEach((role) => {
+					const currentState = typographyRoleState.get(role.id) || {};
+					const selectedFamily = currentState.familyKey || "__default__";
+					const availableWeights = getAvailableWeightsForFamily(selectedFamily);
+					const preferredWeight = currentState.weight || role.defaultWeight;
+					const selectedWeight = pickNearestWeight(
+						availableWeights,
+						preferredWeight,
+					);
+
+					typographyRoleState.set(role.id, {
+						familyKey: selectedFamily,
+						weight: selectedWeight,
+						sizePx: roundNumber(baseSize * role.scale, 2),
+						colorToken: currentState.colorToken || role.colorToken,
+						trackingEm:
+							currentState.trackingEm !== undefined ?
+								currentState.trackingEm
+							:	role.trackingEm,
+					});
+				});
+			}
+
+			/**
+			 * Return line-height multiplier for one role definition.
+			 * @param {{lineHeightGroup: string}} role Typography role definition.
+			 * @returns {number} Line-height multiplier value.
+			 * @example
+			 * getRoleLineHeightMultiplier(TYPOGRAPHY_ROLE_DEFINITIONS[0]);
+			 */
+			function getRoleLineHeightMultiplier(role) {
+				return lineHeightGroupState.get(role.lineHeightGroup) || 1.3;
+			}
+
+			/**
+			 * Render line-height group controls for grouped line-height editing.
+			 * @returns {void}
+			 * @example
+			 * renderLineHeightGroupControls();
+			 */
+			function renderLineHeightGroupControls() {
+				if (!lineHeightGroups) {
+					return;
+				}
+
+				lineHeightGroups.innerHTML = "";
+				LINE_HEIGHT_GROUPS.forEach((group) => {
+					const wrapper = document.createElement("div");
+					const label = document.createElement("label");
+					label.className = "md-typescale-title-small";
+					label.textContent = `${group.label} line-height multiplier`;
+
+					const input = document.createElement("input");
+					input.type = "number";
+					input.step = "0.01";
+					input.min = "0.9";
+					input.max = "2.2";
+					input.style.width = "100%";
+					input.style.marginTop = "0.35rem";
+					input.value = String(
+						roundNumber(
+							lineHeightGroupState.get(group.id) || group.defaultMultiplier,
+							2,
+						),
+					);
+
+					input.addEventListener("input", () => {
+						const parsed = Number(input.value);
+						lineHeightGroupState.set(group.id, clampNumber(parsed, 0.9, 2.2));
+						renderTypographyCards();
+					});
+
+					wrapper.append(label, input);
+					lineHeightGroups.appendChild(wrapper);
+				});
+			}
+
+			/**
+			 * Render per-style typography cards with strict weight availability.
+			 * @returns {void}
+			 * @example
+			 * renderTypographyCards();
+			 */
+			function renderTypographyCards() {
+				if (!fontStyleCards) {
+					return;
+				}
+
+				const responsiveMode = responsiveModeSelect?.value || "both";
+				fontStyleCards.innerHTML = "";
+
+				TYPOGRAPHY_ROLE_DEFINITIONS.forEach((role) => {
+					const state = typographyRoleState.get(role.id);
+					if (!state) {
+						return;
+					}
+
+					const availableWeights = getAvailableWeightsForFamily(
+						state.familyKey,
+					);
+					if (!availableWeights.includes(state.weight)) {
+						state.weight = pickNearestWeight(
+							availableWeights,
+							role.defaultWeight,
+						);
+					}
+
+					const card = document.createElement("article");
+					card.className = "font-style-card";
+
+					const title = document.createElement("h3");
+					title.className = "font-style-title";
+					title.textContent = role.label;
+
+					const familyLabel = document.createElement("label");
+					familyLabel.className = "switch-row";
+					familyLabel.textContent = "Font family";
+
+					const familySelect = document.createElement("select");
+					familySelect.style.marginTop = "0.35rem";
+					getTypographyFamilyOptions().forEach((family) => {
+						const option = document.createElement("option");
+						option.value = family.key;
+						option.textContent = family.label;
+						if (family.key === state.familyKey) {
+							option.selected = true;
+						}
+						familySelect.appendChild(option);
+					});
+
+					familySelect.addEventListener("change", async () => {
+						state.familyKey = familySelect.value;
+						const nextWeights = getAvailableWeightsForFamily(state.familyKey);
+						state.weight = pickNearestWeight(nextWeights, state.weight);
+						try {
+							await ensurePreviewFamilyLoaded(state.familyKey, state.weight);
+						} catch (error) {
+							setFontStatus(
+								`Unable to load preview font: ${error.message}`,
+								true,
+							);
+						}
+						renderTypographyCards();
+					});
+
+					const sizeLabel = document.createElement("label");
+					sizeLabel.className = "switch-row";
+					sizeLabel.textContent = "Font size (px)";
+
+					const sizeInput = document.createElement("input");
+					sizeInput.type = "number";
+					sizeInput.min = "8";
+					sizeInput.max = "160";
+					sizeInput.step = "0.1";
+					sizeInput.value = String(state.sizePx);
+					sizeInput.style.width = "100%";
+					sizeInput.style.marginTop = "0.35rem";
+					sizeInput.addEventListener("input", () => {
+						state.sizePx = clampNumber(Number(sizeInput.value), 8, 160);
+						renderTypographyCards();
+					});
+
+					const trackingLabel = document.createElement("label");
+					trackingLabel.className = "switch-row";
+					trackingLabel.textContent = "Tracking (em)";
+
+					const trackingInput = document.createElement("input");
+					trackingInput.type = "number";
+					trackingInput.min = "-0.2";
+					trackingInput.max = "0.4";
+					trackingInput.step = "0.001";
+					trackingInput.value = String(roundNumber(state.trackingEm, 3));
+					trackingInput.style.width = "100%";
+					trackingInput.style.marginTop = "0.35rem";
+					trackingInput.addEventListener("input", () => {
+						state.trackingEm = clampNumber(
+							Number(trackingInput.value),
+							-0.2,
+							0.4,
+						);
+						renderTypographyCards();
+					});
+
+					const colorLabel = document.createElement("label");
+					colorLabel.className = "switch-row";
+					colorLabel.textContent = "Font color token";
+
+					const colorSelect = document.createElement("select");
+					colorSelect.style.marginTop = "0.35rem";
+					COLOR_TOKEN_OPTIONS.forEach((tokenName) => {
+						const option = document.createElement("option");
+						option.value = tokenName;
+						option.textContent = tokenName.replace("--md-sys-color-", "");
+						if (state.colorToken === tokenName) {
+							option.selected = true;
+						}
+						colorSelect.appendChild(option);
+					});
+					colorSelect.addEventListener("change", () => {
+						state.colorToken = colorSelect.value;
+						renderTypographyCards();
+					});
+
+					const weightGrid = document.createElement("div");
+					weightGrid.className = "weight-grid";
+					WEIGHT_OPTIONS.forEach((weightValue) => {
+						const optionLabel = document.createElement("label");
+						optionLabel.className = "weight-option";
+
+						const input = document.createElement("input");
+						input.type = "radio";
+						input.name = `weight-${role.id}`;
+						input.value = String(weightValue);
+						input.disabled = !availableWeights.includes(weightValue);
+						input.checked = state.weight === weightValue;
+						input.addEventListener("change", async () => {
+							state.weight = weightValue;
+							try {
+								await ensurePreviewFamilyLoaded(state.familyKey, state.weight);
+							} catch (error) {
+								setFontStatus(
+									`Unable to load preview font: ${error.message}`,
+									true,
+								);
+							}
+							renderTypographyCards();
+						});
+
+						const text = document.createElement("span");
+						text.textContent = String(weightValue);
+
+						optionLabel.append(input, text);
+						weightGrid.appendChild(optionLabel);
+					});
+
+					const lineHeightMultiplier = getRoleLineHeightMultiplier(role);
+					const lineHeightPx = roundNumber(
+						state.sizePx * lineHeightMultiplier,
+						2,
+					);
+
+					const note = document.createElement("div");
+					note.className = "token-note";
+					note.textContent = `Color token: ${state.colorToken} | Responsive mode: ${responsiveMode} | Line-height group: ${role.lineHeightGroup}`;
+
+					const preview = document.createElement("div");
+					preview.className = "card-preview";
+					preview.textContent = role.previewText;
+					preview.style.fontFamily = getPreviewFontStack(
+						state.familyKey,
+						state.weight,
+					);
+					preview.style.fontWeight = String(state.weight);
+					preview.style.fontSize = `${roundNumber(state.sizePx, 2)}px`;
+					preview.style.lineHeight = `${lineHeightPx}px`;
+					preview.style.letterSpacing = `${roundNumber(state.trackingEm, 3)}em`;
+					preview.style.color = `var(${state.colorToken})`;
+
+					card.append(
+						title,
+						familyLabel,
+						familySelect,
+						sizeLabel,
+						sizeInput,
+						trackingLabel,
+						trackingInput,
+						colorLabel,
+						colorSelect,
+						weightGrid,
+						note,
+						preview,
+					);
+					fontStyleCards.appendChild(card);
+				});
+			}
+
+			/**
+			 * Build responsive font metadata for one role state.
+			 * @param {number} sizePx Base size in pixels.
+			 * @returns {{min_px: number, max_px: number, clamp: string, breakpoints: {sm: number, md: number, lg: number}}}
+			 * Responsive metadata object.
+			 * @example
+			 * buildResponsiveMetadata(20);
+			 */
+			function buildResponsiveMetadata(sizePx) {
+				const minPx = roundNumber(sizePx * 0.9, 2);
+				const maxPx = roundNumber(sizePx * 1.12, 2);
+				const clampExpression = `clamp(${roundNumber(minPx / 16, 3)}rem, ${roundNumber(sizePx / 16, 3)}rem + 0.35vw, ${roundNumber(maxPx / 16, 3)}rem)`;
+
+				return {
+					min_px: minPx,
+					max_px: maxPx,
+					clamp: clampExpression,
+					breakpoints: {
+						sm: minPx,
+						md: roundNumber(sizePx, 2),
+						lg: maxPx,
+					},
+				};
+			}
+
+			/**
+			 * Build typography JSON export payload.
+			 * @returns {{profile: string, base_size_px: number, responsive_mode: string, line_height_groups: Record<string, number>, roles: Array<object>}}
+			 * Typography export object.
+			 * @example
+			 * const typographyJson = buildTypographyExportJson();
+			 */
+			function buildTypographyExportJson() {
+				const responsiveMode = responsiveModeSelect?.value || "both";
+				const roleExportItems = TYPOGRAPHY_ROLE_DEFINITIONS.map((role) => {
+					const state = typographyRoleState.get(role.id);
+					const responsive = buildResponsiveMetadata(state.sizePx);
+					const lineHeightPx = roundNumber(
+						state.sizePx * getRoleLineHeightMultiplier(role),
+						2,
+					);
+
+					return {
+						id: role.id,
+						label: role.label,
+						family_key: state.familyKey,
+						weight: state.weight,
+						size_px: roundNumber(state.sizePx, 2),
+						tracking_em: roundNumber(state.trackingEm, 3),
+						line_height_px: lineHeightPx,
+						line_height_group: role.lineHeightGroup,
+						color_token: state.colorToken || role.colorToken,
+						responsive,
+					};
+				});
+
+				return {
+					profile: "semantic-material-scale",
+					base_size_px: getTypographyBaseSize(),
+					responsive_mode: responsiveMode,
+					line_height_groups: Object.fromEntries(
+						Array.from(lineHeightGroupState.entries()).map(([group, value]) => [
+							group,
+							roundNumber(value, 2),
+						]),
+					),
+					roles: roleExportItems,
+				};
+			}
+
+			/**
+			 * Build Sass API content for typography role map and mixins.
+			 * @param {{responsive_mode: string, roles: Array<object>}} typographyJson Typography export object.
+			 * @returns {string} Sass source string.
+			 * @example
+			 * const sassText = buildTypographySassApi(typographyJson);
+			 */
+			function buildTypographySassApi(typographyJson) {
+				const lines = [];
+				lines.push('@use "sass:map";');
+				lines.push("");
+				lines.push("$typography-roles: (");
+
+				typographyJson.roles.forEach((role) => {
+					lines.push(`  "${role.id}": (`);
+					lines.push(`    label: "${role.label}",`);
+					lines.push(`    family-key: "${role.family_key}",`);
+					lines.push(`    weight: ${role.weight},`);
+					lines.push(`    size-px: ${role.size_px},`);
+					lines.push(`    tracking-em: ${role.tracking_em},`);
+					lines.push(`    line-height-px: ${role.line_height_px},`);
+					lines.push(`    color-token: "${role.color_token}",`);
+					lines.push(`    clamp: "${role.responsive.clamp}",`);
+					lines.push("    breakpoints: (");
+					lines.push(`      sm: ${role.responsive.breakpoints.sm},`);
+					lines.push(`      md: ${role.responsive.breakpoints.md},`);
+					lines.push(`      lg: ${role.responsive.breakpoints.lg},`);
+					lines.push("    ),");
+					lines.push("  ),");
+				});
+
+				lines.push(");");
+				lines.push("");
+				lines.push("@function typography-role($name) {");
+				lines.push("  @return map.get($typography-roles, $name);");
+				lines.push("}");
+				lines.push("");
+				lines.push("@mixin apply-type($name) {");
+				lines.push("  $role: typography-role($name);");
+				lines.push(
+					'  @if $role == null { @error "Unknown type role: #{$name}"; }',
+				);
+				lines.push("  font-weight: map.get($role, weight);");
+				lines.push("  font-size: #{map.get($role, size-px)}px;");
+				lines.push("  line-height: #{map.get($role, line-height-px)}px;");
+				lines.push("  letter-spacing: #{map.get($role, tracking-em)}em;");
+				lines.push("  color: var(#{map.get($role, color-token)});");
+				lines.push("}");
+				lines.push("");
+				lines.push('@mixin apply-type-responsive($name, $mode: "both") {');
+				lines.push("  $role: typography-role($name);");
+				lines.push(
+					'  @if $role == null { @error "Unknown type role: #{$name}"; }',
+				);
+				lines.push("  @include apply-type($name);");
+				lines.push("");
+				lines.push('  @if $mode == "clamp" or $mode == "both" {');
+				lines.push("    font-size: unquote(map.get($role, clamp));");
+				lines.push("  }");
+				lines.push("");
+				lines.push('  @if $mode == "breakpoints" or $mode == "both" {');
+				lines.push("    $bps: map.get($role, breakpoints);");
+				lines.push("    @media (min-width: 600px) {");
+				lines.push("      font-size: #{map.get($bps, sm)}px;");
+				lines.push("    }");
+				lines.push("    @media (min-width: 840px) {");
+				lines.push("      font-size: #{map.get($bps, md)}px;");
+				lines.push("    }");
+				lines.push("    @media (min-width: 1200px) {");
+				lines.push("      font-size: #{map.get($bps, lg)}px;");
+				lines.push("    }");
+				lines.push("  }");
+				lines.push("}");
+				lines.push("");
+				lines.push(
+					`$typography-responsive-mode: "${typographyJson.responsive_mode}";`,
+				);
+
+				return lines.join("\n");
+			}
+
+			/**
+			 * Build utility Sass classes for all typography roles.
+			 * @param {{responsive_mode: string, roles: Array<object>}} typographyJson Typography export object.
+			 * @returns {string} Sass source string.
+			 * @example
+			 * const utilitySass = buildTypographyUtilitySass(typographyJson);
+			 */
+			function buildTypographyUtilitySass(typographyJson) {
+				const lines = [];
+				lines.push('@use "./typography" as typography;');
+				lines.push("");
+
+				typographyJson.roles.forEach((role) => {
+					lines.push(`.u-type-${role.id} {`);
+					lines.push(`  @include typography.apply-type("${role.id}");`);
+					lines.push("}");
+					lines.push("");
+					lines.push(`.u-type-${role.id}.is-responsive {`);
+					lines.push(
+						`  @include typography.apply-type-responsive("${role.id}", "${typographyJson.responsive_mode}");`,
+					);
+					lines.push("}");
+					lines.push("");
+				});
+
+				return lines.join("\n");
+			}
+
+			/**
+			 * Return selected font files for export package.
+			 * @returns {string[]} Selected font files.
+			 * @example
+			 * const files = getSelectedFontFilesForExport();
+			 */
+			function getSelectedFontFilesForExport() {
+				const selected = new Set();
+
+				if (fontSelect && fontSelect.value) {
+					selected.add(fontSelect.value);
+				}
+
+				for (const state of typographyRoleState.values()) {
+					if (state.familyKey === "__default__") {
+						continue;
+					}
+
+					const family = fontFamilyByKey.get(state.familyKey);
+					if (!family || !Array.isArray(family.files)) {
+						continue;
+					}
+
+					family.files.forEach((fontFileName) => selected.add(fontFileName));
+				}
+
+				return Array.from(selected).sort((left, right) =>
+					left.localeCompare(right),
+				);
+			}
+
+			/**
+			 * Collect component checkbox state for export.
+			 * @returns {{components: Array<object>}} UI element state payload.
+			 * @example
+			 * const uiPayload = buildUiElementsExportJson();
+			 */
+			function buildUiElementsExportJson() {
+				const sections = Array.from(
+					document.querySelectorAll(".component-block"),
+				);
+				const components = sections.map((section) => {
+					const componentId =
+						section.dataset.component || section.id || "component";
+					const label =
+						section.querySelector(".component-label")?.textContent?.trim() ||
+						componentId;
+					const componentToggle = section.querySelector(".component-toggle");
+					const variants = getVariantRows(section).map((row) => {
+						const toggle = row.querySelector(".variant-toggle");
+						const variantName =
+							row.querySelector(".variant-name")?.textContent?.trim() ||
+							row.dataset.variant ||
+							"variant";
+
+						return {
+							id: row.dataset.variant || variantName.toLowerCase(),
+							label: variantName,
+							enabled: Boolean(toggle?.checked),
+						};
+					});
+
+					return {
+						component_id: componentId,
+						label,
+						enabled: Boolean(componentToggle?.checked),
+						variants,
+					};
+				});
+
+				return {
+					generated_at: new Date().toISOString(),
+					components,
+				};
+			}
+
+			/**
+			 * Trigger file download for a response blob.
+			 * @param {Blob} payloadBlob Blob response.
+			 * @param {string} fileName Download file name.
+			 * @returns {void}
+			 * @example
+			 * triggerBlobDownload(blob, "export.zip");
+			 */
+			function triggerBlobDownload(payloadBlob, fileName) {
+				const objectUrl = URL.createObjectURL(payloadBlob);
+				const anchor = document.createElement("a");
+				anchor.href = objectUrl;
+				anchor.download = fileName;
+				document.body.appendChild(anchor);
+				anchor.click();
+				anchor.remove();
+				URL.revokeObjectURL(objectUrl);
+			}
+
+			/**
+			 * Resolve a CSS font-family string for a typography role for use in Sass export.
+			 * Returns an empty string when the role uses the default font (server keeps its own default).
+			 * @param {string} roleId Typography role id, e.g. "body-large" or "display-large".
+			 * @returns {string} CSS font-family value, e.g. '"YuGothic", sans-serif', or "".
+			 * @example
+			 * buildFontCssForExport("body-large");
+			 */
+			function buildFontCssForExport(roleId) {
+				const state = typographyRoleState.get(roleId);
+				if (!state || state.familyKey === "__default__") {
+					return "";
+				}
+				const family = fontFamilyByKey.get(state.familyKey);
+				if (!family || !family.display_name) {
+					return "";
+				}
+				return `"${family.display_name}", sans-serif`;
+			}
+
+			/**
+			 * POST typography/theme configuration and download zip export package.
+			 * Payload fields expected by server.py _handle_export_package():
+			 *   theme_file, selected_font_files, icon_source, typography_json,
+			 *   plain_font_css, brand_font_css
+			 * @returns {Promise<void>}
+			 * @example
+			 * await exportThemePackage();
+			 */
+			async function exportThemePackage() {
+				if (!themeFileSelect.value) {
+					exportStatus.textContent = "Select a theme file before exporting.";
+					return;
+				}
+
+				const typographyJson = buildTypographyExportJson();
+				const payload = {
+					theme_file: themeFileSelect.value,
+					selected_font_files: getSelectedFontFilesForExport(),
+					icon_source: iconExportSource?.value || "all",
+					typography_json: typographyJson,
+					plain_font_css: buildFontCssForExport("body-large"),
+					brand_font_css: buildFontCssForExport("display-large"),
+				};
+
+				exportThemePackageButton.disabled = true;
+				exportThemePackageButton.classList.add("is-loading");
+				exportStatus.textContent = "Building export package...";
+
+				try {
+					const response = await fetch("/api/export-package", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(payload),
+					});
+
+					if (!response.ok) {
+						let message = `Export failed (${response.status})`;
+						try {
+							const errorPayload = await response.json();
+							if (errorPayload.error) {
+								message = `${message}: ${errorPayload.error}`;
+							}
+						} catch {
+							// Keep status text generic if JSON parsing fails.
+						}
+						throw new Error(message);
+					}
+
+					const zipBlob = await response.blob();
+					const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+					triggerBlobDownload(zipBlob, `material-theme-export-${stamp}.zip`);
+					exportStatus.textContent = "Export complete. Download started.";
+				} catch (error) {
+					exportStatus.textContent = error.message || "Export failed.";
+				} finally {
+					exportThemePackageButton.disabled = false;
+					exportThemePackageButton.classList.remove("is-loading");
+				}
+			}
+
+			/**
+			 * Initialize typography studio controls, grouped line-height, and style cards.
+			 * @returns {void}
+			 * @example
+			 * initializeTypographyStudio();
+			 */
+			function initializeTypographyStudio() {
+				if (!fontStyleCards || !lineHeightGroups) {
+					return;
+				}
+
+				syncTypographyRoleState();
+				renderLineHeightGroupControls();
+				renderTypographyCards();
+
+				if (typographyEventsBound) {
+					return;
+				}
+
+				if (typographyBaseSizeInput) {
+					typographyBaseSizeInput.addEventListener("input", () => {
+						syncTypographyRoleState();
+						renderTypographyCards();
+					});
+				}
+
+				if (responsiveModeSelect) {
+					responsiveModeSelect.addEventListener("change", () => {
+						renderTypographyCards();
+					});
+				}
+
+				if (exportThemePackageButton) {
+					exportThemePackageButton.addEventListener("click", () => {
+						exportThemePackage().catch((error) => {
+							exportStatus.textContent =
+								error.message || "Unexpected export error.";
+						});
+					});
+				}
+
+				typographyEventsBound = true;
+			}
+
+			/**
+			 * Render one button per scheme in the selected theme.
+			 * @param {{schemes?: Record<string, Record<string, string>>}} themeJson Parsed theme JSON.
+			 * @returns {void}
+			 * @example
+			 * renderSchemeButtons(loadedTheme);
+			 */
+			function renderSchemeButtons(themeJson) {
+				schemeButtons.innerHTML = "";
+				const schemes = Object.keys(themeJson.schemes || {});
+
+				if (schemes.length === 0) {
+					setStatus("No schemes found in selected JSON.", true);
+					return;
+				}
+
+				schemes.forEach((schemeName) => {
+					const button = document.createElement("button");
+					button.type = "button";
+					button.className = "scheme-button";
+					button.dataset.scheme = schemeName;
+					button.textContent = schemeName;
+					button.addEventListener("click", () => applyScheme(schemeName));
+					schemeButtons.appendChild(button);
+				});
+
+				const defaultScheme = schemes.includes("light") ? "light" : schemes[0];
+				applyScheme(defaultScheme);
+			}
+
+			/**
+			 * Fetch and load a single theme file by name.
+			 * @param {string} themeFileName File name from /api/themes.
+			 * @returns {Promise<void>}
+			 * @example
+			 * await loadThemeFile("material-theme-OnSiteXI.json");
+			 */
+			async function loadThemeFile(themeFileName) {
+				if (
+					typeof themeFileName !== "string" ||
+					!themeFileName.startsWith("material-theme-") ||
+					!themeFileName.endsWith(".json")
+				) {
+					throw new Error("Invalid theme file name");
+				}
+
+				const response = await fetch(
+					`/api/theme/${encodeURIComponent(themeFileName)}`,
+				);
+				if (!response.ok) {
+					throw new Error(`Unable to load ${themeFileName}`);
+				}
+				loadedTheme = await response.json();
+				logDebug("Loaded theme payload", themeFileName, loadedTheme);
+				setStatus(`Loaded ${themeFileName}`);
+				renderSchemeButtons(loadedTheme);
+			}
+
+			/**
+			 * Fetch available theme files and load the first one.
+			 * @returns {Promise<void>}
+			 * @example
+			 * await loadThemeFiles();
+			 */
+			async function loadThemeFiles() {
+				const response = await fetch("/api/themes");
+				if (!response.ok) {
+					throw new Error("Unable to load theme file list");
+				}
+
+				const payload = await response.json();
+				const themeFiles = payload.theme_files || [];
+				logDebug("Theme file list", themeFiles);
+				themeFileSelect.innerHTML = "";
+				themeFileSelect.disabled = themeFiles.length === 0;
+
+				if (themeFiles.length === 0) {
+					setStatus("No material-theme-*.json files found.", true);
+					return;
+				}
+
+				themeFiles.forEach((fileName) => {
+					const option = document.createElement("option");
+					option.value = fileName;
+					option.textContent = fileName;
+					themeFileSelect.appendChild(option);
+				});
+
+				await loadThemeFile(themeFiles[0]);
+			}
+
+			/**
+			 * Return variant rows for a single component section.
+			 * @param {HTMLElement} section A component-block section.
+			 * @returns {HTMLElement[]} Variant row elements.
+			 * @example
+			 * const rows = getVariantRows(section);
+			 */
+			function getVariantRows(section) {
+				return Array.from(section.querySelectorAll(".variant-row"));
+			}
+
+			/**
+			 * Return variant checkbox inputs for a component section.
+			 * @param {HTMLElement} section A component-block section.
+			 * @returns {HTMLInputElement[]} Variant checkbox inputs.
+			 * @example
+			 * const toggles = getVariantToggles(section);
+			 */
+			function getVariantToggles(section) {
+				return getVariantRows(section).map((row) =>
+					row.querySelector(".variant-toggle"),
+				);
+			}
+
+			/**
+			 * Sync UI visibility and parent checkbox state for one component section.
+			 * @param {HTMLElement} section A component-block section.
+			 * @returns {void}
+			 * @example
+			 * updateSectionState(section);
+			 */
+			function updateSectionState(section) {
+				const componentToggle = section.querySelector(".component-toggle");
+				const variantRows = getVariantRows(section);
+				const variantToggles = getVariantToggles(section);
+
+				variantRows.forEach((row) => {
+					const toggle = row.querySelector(".variant-toggle");
+					row.hidden = !toggle.checked;
+				});
+
+				const checkedCount = variantToggles.filter(
+					(checkbox) => checkbox.checked,
+				).length;
+
+				componentToggle.checked =
+					variantToggles.length > 0 && checkedCount === variantToggles.length;
+				componentToggle.indeterminate =
+					checkedCount > 0 && checkedCount < variantToggles.length;
+			}
+
+			/**
+			 * Attach checkbox event handlers for all component sections.
+			 * @returns {void}
+			 * @example
+			 * initializeComponentSections();
+			 */
+			function initializeComponentSections() {
+				const sections = Array.from(
+					document.querySelectorAll(".component-block"),
+				);
+
+				sections.forEach((section) => {
+					const componentToggle = section.querySelector(".component-toggle");
+					const variantToggles = Array.from(
+						section.querySelectorAll(".variant-toggle"),
+					);
+
+					componentToggle.addEventListener("change", () => {
+						variantToggles.forEach((toggle) => {
+							toggle.checked = componentToggle.checked;
+						});
+						componentToggle.indeterminate = false;
+						updateSectionState(section);
+					});
+
+					variantToggles.forEach((toggle) => {
+						toggle.addEventListener("change", () => {
+							updateSectionState(section);
+						});
+					});
+
+					updateSectionState(section);
+				});
+			}
+
+			/**
+			 * Build right-side quick navigation links for component sections.
+			 * @returns {void}
+			 * @example
+			 * initializeComponentJumpList();
+			 */
+			function initializeComponentJumpList() {
+				if (!componentNavList) {
+					return;
+				}
+
+				componentNavList.innerHTML = "";
+				const sections = Array.from(
+					document.querySelectorAll(".component-block"),
+				);
+
+				sections.forEach((section, index) => {
+					if (!section.id) {
+						const slug = section.dataset.component || `section-${index + 1}`;
+						section.id = `component-${slug}`;
+					}
+
+					const labelText =
+						section.querySelector(".component-label")?.textContent?.trim() ||
+						section.id;
+
+					const link = document.createElement("a");
+					link.className = "component-jump-link";
+					link.href = `#${section.id}`;
+					link.textContent = labelText;
+					componentNavList.appendChild(link);
+				});
+			}
+
+			/**
+			 * Wire checkbox interactions for the Numeric Features card.
+			 *
+			 * Each .nf-checkbox has:
+			 *   data-class      — the CSS class to toggle on the preview span
+			 *   data-preview    — matches the data-preview attribute on the target span
+			 *
+			 * When #nf-tabular is checked the currency note row is revealed, showing
+			 * the .md-currency class preview and noting it will be included in the
+			 * SCSS export.
+			 *
+			 * @returns {void}
+			 * @example
+			 * initializeNumericFeatures();
+			 */
+			function initializeNumericFeatures() {
+				const currencyNote = document.getElementById("numeric-currency-note");
+
+				document.querySelectorAll(".nf-checkbox").forEach((checkbox) => {
+					checkbox.addEventListener("change", () => {
+						const targetClass  = checkbox.dataset.class;
+						const previewKey   = checkbox.dataset.preview;
+						const previewEl    = document.querySelector(
+							`.numeric-preview[data-preview="${previewKey}"]`,
+						);
+
+						if (previewEl && targetClass) {
+							previewEl.classList.toggle(targetClass, checkbox.checked);
+						}
+
+						// Currency note: reveal only while tabular-nums is active
+						if (checkbox.id === "nf-tabular" && currencyNote) {
+							currencyNote.hidden = !checkbox.checked;
+						}
+					});
+				});
+			}
+
+			/**
+			 * Wire interactive demo behaviors for components that need JS triggers.
+			 * Dialog uses native <dialog> element — showModal() / close().
+			 * Menu demo is a stub (no template equivalent).
+			 * @returns {void}
+			 * @example
+			 * initializeInteractiveDemos();
+			 */
+			function initializeInteractiveDemos() {
+				const openDialogButton = document.getElementById("open-dialog-button");
+				const demoDialog = document.getElementById("demo-dialog");
+				if (openDialogButton && demoDialog) {
+					openDialogButton.addEventListener("click", () => {
+						demoDialog.showModal();
+					});
+
+					demoDialog
+						.querySelectorAll("[data-dialog-close]")
+						.forEach((button) => {
+							button.addEventListener("click", () => {
+								demoDialog.close();
+							});
+						});
+				}
+			}
+
+			themeFileSelect.addEventListener("change", async () => {
+				try {
+					await loadThemeFile(themeFileSelect.value);
+				} catch (error) {
+					setStatus(error.message, true);
+				}
+			});
+
+			fontSelect.addEventListener("change", async () => {
+				try {
+					await applyFontSelection(fontSelect.value);
+				} catch (error) {
+					setFontStatus(`Unable to load font: ${error.message}`, true);
+				}
+			});
+
+			if (iconSourceSelect) {
+				iconSourceSelect.addEventListener("change", () => {
+					renderIconPreview(iconSourceSelect.value);
+				});
+			}
+
+			initializeComponentSections();
+			initializeComponentJumpList();
+			initializeInteractiveDemos();
+			initializeNumericFeatures();
+			initializeTypographyStudio();
+			loadFontFiles().catch((error) => {
+				setFontStatus(error.message, true);
+			});
+			loadIconInventory().catch((error) => {
+				setIconStatus(error.message, true);
+			});
+			loadThemeFiles().catch((error) => {
+				setStatus(error.message, true);
+			});
+		</script>
+	</body>
+</html>

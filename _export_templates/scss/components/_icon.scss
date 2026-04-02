@@ -1,0 +1,108 @@
+// components/_icon.scss — MD3 Icon — CSS mask coloring technique
+// ─────────────────────────────────────────────────────────────────────────────
+// Renders SVG icons from external files with full CSS-controlled color.
+//
+// <img> elements do not respond to CSS color properties — the browser renders
+// the SVG as a raster bitmap and ignores fill/stroke overrides. This component
+// uses the CSS mask-image technique instead: a transparent <span> is shaped by
+// the SVG as a mask and filled with background-color: currentColor. The icon
+// color therefore tracks the inherited CSS `color` value — set via token,
+// class, or inline style — and updates automatically when themes switch.
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   Default (24px) — set --icon-src via inline style:
+//   <span class="md-icon"
+//         style="--icon-src: url('/icons/search-outline.svg')"
+//         role="img" aria-label="search"></span>
+//
+//   Large (32px):
+//   <span class="md-icon md-icon--lg"
+//         style="--icon-src: url('/icons/home-outline.svg')"
+//         role="img" aria-label="home"></span>
+//
+//   Small (20px):
+//   <span class="md-icon md-icon--sm"
+//         style="--icon-src: url('/icons/close.svg')"
+//         role="img" aria-label="close"></span>
+//
+//   With explicit primary color (standalone icons section):
+//   <span class="md-icon md-icon--lg"
+//         style="--icon-src: url('/icons/star.svg'); color: var(--md-sys-color-primary)"
+//         role="img" aria-label="star"></span>
+//
+//   Or color the parent wrapper and let all children inherit:
+//   <div style="color: var(--md-sys-color-primary)">
+//     <span class="md-icon md-icon--lg" style="--icon-src: url('/icons/home-outline.svg')" role="img" aria-label="home"></span>
+//     <span class="md-icon md-icon--lg" style="--icon-src: url('/icons/settings-outline.svg')" role="img" aria-label="settings"></span>
+//   </div>
+//
+//   Inside .md-icon-btn — inherits the button's `color` token automatically:
+//   <button class="md-icon-btn" aria-label="Search">
+//     <span class="md-icon" style="--icon-src: url('/icons/search-outline.svg')" aria-hidden="true"></span>
+//   </button>
+//
+//   Filled icon button (icon inherits on-primary from button SCSS):
+//   <button class="md-icon-btn md-icon-btn--filled" aria-label="Create">
+//     <span class="md-icon" style="--icon-src: url('/icons/create-outline.svg')" aria-hidden="true"></span>
+//   </button>
+//
+// ─── How color is applied ─────────────────────────────────────────────────────
+//   background-color: currentColor fills the masked region with the inherited
+//   `color` value. Color control options:
+//
+//   1. Inline style on the span:
+//        style="--icon-src: url('...'); color: var(--md-sys-color-primary)"
+//   2. Color on a parent wrapper:
+//        <div style="color: var(--md-sys-color-on-surface-variant)"> ... </div>
+//   3. Inside .md-icon-btn — no extra style needed. The button SCSS sets:
+//        standard  → color: --md-sys-color-on-surface-variant
+//        filled    → color: --md-sys-color-on-primary
+//        tonal     → color: --md-sys-color-on-secondary-container
+//        outlined  → color: --md-sys-color-on-surface-variant
+//      The span's background-color: currentColor picks this up automatically.
+//      Disabled state uses color-mix() on the button — also inherited.
+//
+// ─── Browser support ──────────────────────────────────────────────────────────
+//   mask-image: Chrome 1+, Firefox 53+, Safari 15.4+.
+//   -webkit-mask-image prefixes included for older WebKit.
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   None directly — inherits `color` from context. Explicit token examples:
+//   --md-sys-color-primary / on-surface / on-surface-variant / on-primary
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-icon {
+  --icon-src:              none;   // Set via inline style: style="--icon-src: url('...')"
+
+  display:                 inline-block;
+  width:                   1.5rem;       // 24px default
+  height:                  1.5rem;
+  background-color:        currentColor;
+
+  // Standard (unprefixed) properties
+  mask-image:              var(--icon-src);
+  mask-size:               contain;
+  mask-repeat:             no-repeat;
+  mask-position:           center;
+
+  // WebKit prefix — still required for some Safari versions
+  -webkit-mask-image:      var(--icon-src);
+  -webkit-mask-size:       contain;
+  -webkit-mask-repeat:     no-repeat;
+  -webkit-mask-position:   center;
+
+  flex-shrink:             0;
+  vertical-align:          middle;
+}
+
+// ─── Size modifiers ───────────────────────────────────────────────────────────
+
+.md-icon--sm {
+  width:  1.25rem;   // 20px
+  height: 1.25rem;
+}
+
+.md-icon--lg {
+  width:  2rem;      // 32px
+  height: 2rem;
+}

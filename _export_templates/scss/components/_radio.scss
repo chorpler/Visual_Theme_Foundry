@@ -1,0 +1,107 @@
+// components/_radio.scss — MD3 Radio Button
+// ─────────────────────────────────────────────────────────────────────────────
+// Styles a native <input type="radio"> to match MD3 radio button specification.
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   <fieldset>
+//     <legend>Choose an option</legend>
+//
+//     <label class="md-radio-label">
+//       <input class="md-radio" type="radio" name="group" value="a">
+//       Option A
+//     </label>
+//
+//     <label class="md-radio-label">
+//       <input class="md-radio" type="radio" name="group" value="b">
+//       Option B
+//     </label>
+//   </fieldset>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-primary / on-primary / on-surface / on-surface-variant
+//   --md-sys-color-outline
+//   --md-sys-state-hover-state-layer-opacity
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-radio {
+  appearance:     none;
+  -webkit-appearance: none;
+  width:          1.25rem;     // 20px — MD3 radio outer circle
+  height:         1.25rem;
+  border:         2px solid var(--md-sys-color-on-surface-variant);
+  border-radius:  50%;
+  background:     transparent;
+  cursor:         pointer;
+  position:       relative;
+  flex-shrink:    0;
+  transition:     border-color var(--md-sys-motion-duration-short3)
+                               var(--md-sys-motion-easing-standard);
+
+  // State layer ring
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         -0.625rem;
+    border-radius: 50%;
+    background:    var(--md-sys-color-on-surface);
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+  }
+
+  &:hover::before         { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  &:active::before        { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+
+  // Inner dot (::after) — hidden when unchecked
+  &::after {
+    content:       '';
+    position:      absolute;
+    top:           50%;
+    left:          50%;
+    width:         0.625rem;   // 10px inner dot
+    height:        0.625rem;
+    border-radius: 50%;
+    background:    var(--md-sys-color-primary);
+    transform:     translate(-50%, -50%) scale(0);
+    transition:    transform var(--md-sys-motion-duration-short3)
+                             var(--md-sys-motion-easing-emphasized-decelerate);
+  }
+
+  // Checked state
+  &:checked {
+    border-color: var(--md-sys-color-primary);
+
+    &::before { background: var(--md-sys-color-primary); }
+    &::after  { transform:  translate(-50%, -50%) scale(1); }
+  }
+
+  // Disabled
+  &:disabled {
+    cursor:         not-allowed;
+    border-color:   color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    pointer-events: none;
+
+    &::before { display: none; }
+
+    &::after {
+      background: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    }
+  }
+}
+
+.md-radio-label {
+  display:     inline-flex;
+  align-items: center;
+  gap:         0.75rem;
+  cursor:      pointer;
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size:   var(--md-sys-typescale-body-large-size);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+  color:       var(--md-sys-color-on-surface);
+
+  &:has(.md-radio:disabled) {
+    cursor: not-allowed;
+    color:  color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}

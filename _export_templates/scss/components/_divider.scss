@@ -1,0 +1,39 @@
+// components/_divider.scss — MD3 Divider
+// ─────────────────────────────────────────────────────────────────────────────
+// A thin horizontal or vertical rule for separating content.
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   Horizontal (default):
+//   <hr class="md-divider">
+//
+//   Inset (left-padded to align with list item text):
+//   <hr class="md-divider md-divider--inset">
+//
+//   Vertical (use inside a flex container):
+//   <div class="md-divider md-divider--vertical" role="separator"></div>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-outline-variant
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-divider {
+  border:     none;
+  background: var(--md-sys-color-outline-variant);
+  margin:     0;
+
+  // Horizontal (default)
+  display: block;
+  height:  1px;
+  width:   100%;
+
+  &--inset {
+    margin-left: 1rem;
+    width: calc(100% - 1rem);
+  }
+
+  &--vertical {
+    width:  1px;
+    height: 100%;
+    align-self: stretch;
+  }
+}

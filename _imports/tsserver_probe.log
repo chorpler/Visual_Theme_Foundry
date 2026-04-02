@@ -1,0 +1,8 @@
+Info 0    [23:22:45.988] Starting TS Server
+Info 1    [23:22:45.988] Version: 5.9.3
+Info 2    [23:22:45.988] Arguments: D:\nodejs\node.exe D:\Dropbox\Bald Builders\_schedule_app\_imports\typescript\lib\tsserver.js --disableAutomaticTypingAcquisition --logVerbosity verbose --logFile _imports/tsserver_probe.log
+Info 3    [23:22:45.988] Platform: win32 NodeVersion: v24.13.1 CaseSensitive: false
+Info 4    [23:22:45.988] ServerMode: undefined hasUnknownServerMode: undefined
+Info 5    [23:22:45.993] currentDirectory:: D:\Dropbox\Bald Builders\_schedule_app useCaseSensitiveFileNames:: false
+Info 6    [23:22:45.993] libs Location:: D:/Dropbox/Bald Builders/_schedule_app/_imports/typescript/lib
+Info 7    [23:22:45.993] globalTypingsCacheLocation:: undefined

@@ -1,0 +1,188 @@
+// components/_chip.scss — MD3 Chip Variants
+// ─────────────────────────────────────────────────────────────────────────────
+// Assist, filter, input, and suggestion chip variants.
+// All chips share a common base; variants modify color and affordance.
+//
+// ─── Markup — Assist ──────────────────────────────────────────────────────────
+//   <button class="md-chip md-chip--assist">Label</button>
+//   <button class="md-chip md-chip--assist">
+//     <span class="md-chip__icon" aria-hidden="true">search</span>
+//     Label
+//   </button>
+//
+// ─── Markup — Filter ──────────────────────────────────────────────────────────
+//   Filter chips are toggleable — use a <button> with aria-pressed or
+//   an <input type="checkbox"> with a <label>. Selected state via .md-chip--selected.
+//
+//   <button class="md-chip md-chip--filter" aria-pressed="false">Label</button>
+//   <button class="md-chip md-chip--filter md-chip--selected" aria-pressed="true">
+//     <span class="md-chip__icon" aria-hidden="true">check</span>
+//     Label
+//   </button>
+//
+// ─── Markup — Input ───────────────────────────────────────────────────────────
+//   Input chips represent a value entered by the user and include a remove button.
+//   <span class="md-chip md-chip--input">
+//     <span class="md-chip__icon" aria-hidden="true">person</span>
+//     Ada Lovelace
+//     <button class="md-chip__remove" aria-label="Remove Ada Lovelace">
+//       <span aria-hidden="true">close</span>
+//     </button>
+//   </span>
+//
+// ─── Markup — Suggestion ──────────────────────────────────────────────────────
+//   <button class="md-chip md-chip--suggestion">Label</button>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-on-surface / surface / on-secondary-container / secondary-container
+//   --md-sys-color-outline / outline-variant / primary
+//   --md-sys-shape-corner-small
+//   --md-sys-typescale-label-large-*
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+
+.md-chip {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.5rem;
+  height:          2rem;          // 32px — MD3 chip height
+  padding:         0 1rem;
+  border-radius:   var(--md-sys-shape-corner-small);
+  border:          none;
+  background:      transparent;
+  color:           var(--md-sys-color-on-surface);
+  font-family:     var(--md-sys-typescale-label-large-font);
+  font-size:       var(--md-sys-typescale-label-large-size);
+  font-weight:     var(--md-sys-typescale-label-large-weight);
+  line-height:     var(--md-sys-typescale-label-large-line-height);
+  cursor:          pointer;
+  position:        relative;
+  overflow:        hidden;
+  white-space:     nowrap;
+  text-decoration: none;
+  outline:         none;
+  transition:      box-shadow var(--md-sys-motion-duration-short4)
+                              var(--md-sys-motion-easing-standard);
+
+  // State layer
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         0;
+    border-radius: inherit;
+    background:    currentColor;
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+    pointer-events:none;
+  }
+
+  &:hover::before         { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  &:active::before        { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+
+  &:disabled {
+    cursor:         not-allowed;
+    pointer-events: none;
+    color:          color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}
+
+.md-chip__icon {
+  font-size:   1.125rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+// ─── Assist ───────────────────────────────────────────────────────────────────
+// Helps users take actions related to content on screen.
+
+.md-chip--assist {
+  border:     1px solid var(--md-sys-color-outline);
+  box-shadow: var(--md-sys-elevation-level0);
+
+  &:hover { box-shadow: var(--md-sys-elevation-level1); }
+
+  &:disabled {
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    box-shadow:   none;
+  }
+}
+
+// ─── Filter ───────────────────────────────────────────────────────────────────
+// Toggleable. Adds a check icon when selected. Manage aria-pressed via JS.
+
+.md-chip--filter {
+  border:     1px solid var(--md-sys-color-outline);
+
+  // Selected state
+  &.md-chip--selected {
+    background:   var(--md-sys-color-secondary-container);
+    color:        var(--md-sys-color-on-secondary-container);
+    border-color: transparent;
+  }
+
+  &:disabled {
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  }
+}
+
+// ─── Input ────────────────────────────────────────────────────────────────────
+// Represents a user-entered value. Contains a remove action.
+
+.md-chip--input {
+  border:     1px solid var(--md-sys-color-outline);
+  padding-right: 0.5rem; // tighter right padding for remove button
+
+  &:focus-within { border-color: var(--md-sys-color-primary); }
+
+  &.md-chip--selected {
+    background:   var(--md-sys-color-secondary-container);
+    color:        var(--md-sys-color-on-secondary-container);
+    border-color: transparent;
+  }
+}
+
+.md-chip__remove {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content:center;
+  width:         1.125rem;
+  height:        1.125rem;
+  border:        none;
+  border-radius: 50%;
+  background:    transparent;
+  color:         inherit;
+  cursor:        pointer;
+  padding:       0;
+  font-size:     1rem;
+  flex-shrink:   0;
+  position:      relative;
+  overflow:      hidden;
+
+  &::before {
+    content:       '';
+    position:      absolute;
+    inset:         0;
+    border-radius: 50%;
+    background:    currentColor;
+    opacity:       0;
+    transition:    opacity var(--md-sys-motion-duration-short2)
+                           var(--md-sys-motion-easing-standard);
+  }
+
+  &:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  &:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+}
+
+// ─── Suggestion ───────────────────────────────────────────────────────────────
+// Presents dynamically generated completions or alternatives.
+
+.md-chip--suggestion {
+  border: 1px solid var(--md-sys-color-outline);
+
+  &:disabled {
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  }
+}

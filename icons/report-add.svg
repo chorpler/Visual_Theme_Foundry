@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg4"
+   version="1.1"
+   viewBox="0 0 512 512">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <g
+     transform="matrix(1.408401,0,0,1.408401,-86.86254,-121.70401)"
+     id="g5081">
+    <g
+       id="g6301">
+      <g
+         transform="matrix(0.20910364,0,0,0.20910364,505.211,136.522)"
+         id="g4503">
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.49509144;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect4491"
+           width="117.82694"
+           height="601.62354"
+           x="-906.09991"
+           y="-222.71008" />
+        <rect
+           y="546.37469"
+           x="19.188213"
+           height="601.62354"
+           width="117.82694"
+           id="rect4499"
+           style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.49509144;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           transform="rotate(90)" />
+      </g>
+      <g
+         id="g6289">
+        <path
+           d="M 240.35997,157.0872 H 128 V 439.28622 H 327.75105 V 239.02781 Z m 0,16.60859 70.06892,65.69946 H 240.35997 Z M 140.48444,427.52792 V 168.8455 h 87.39109 v 82.30805 h 87.39108 v 176.37437 z"
+           id="path2"
+           style="stroke-width:0.75724548" />
+        <g
+           id="g6281">
+          <path
+             d="m 193.15154,258.43119 h 109.65391 v 11.43348 H 193.15154 Z m 0,68.60088 h 109.65391 v 11.43348 H 193.15154 Z m 0,68.60088 h 109.65391 v 11.43348 H 193.15154 Z"
+             id="path23"
+             style="stroke-width:0.81836754;fill:#000000;fill-opacity:1" />
+          <ellipse
+             ry="11.43348"
+             rx="9.1378269"
+             cy="264.14792"
+             cx="165.73805"
+             id="circle25"
+             style="stroke-width:0.81836754" />
+          <ellipse
+             ry="11.43348"
+             rx="9.1378269"
+             cy="332.74881"
+             cx="165.73805"
+             id="circle27"
+             style="stroke-width:0.81836754" />
+          <ellipse
+             ry="11.43348"
+             rx="9.1378269"
+             cy="401.3497"
+             cx="165.73805"
+             id="circle29"
+             style="stroke-width:0.81836754" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

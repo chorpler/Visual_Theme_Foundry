@@ -1,0 +1,141 @@
+// components/_switch.scss — MD3 Switch
+// ─────────────────────────────────────────────────────────────────────────────
+// Styles a native <input type="checkbox"> as an MD3 toggle switch using
+// appearance: none. The track and thumb are rendered via the element and ::after.
+//
+// ─── Markup ───────────────────────────────────────────────────────────────────
+//   <label class="md-switch-label">
+//     <input class="md-switch" type="checkbox" role="switch">
+//     Wi-Fi
+//   </label>
+//
+//   Disabled:
+//   <label class="md-switch-label">
+//     <input class="md-switch" type="checkbox" role="switch" disabled>
+//     Bluetooth
+//   </label>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   --md-sys-color-primary / on-primary / surface-container-highest
+//   --md-sys-color-outline / on-surface-variant
+//   --md-sys-shape-corner-full
+//   --md-sys-state-hover-state-layer-opacity
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-switch {
+  appearance:     none;
+  -webkit-appearance: none;
+
+  // Track dimensions — 52×32px per MD3 spec
+  width:          3.25rem;
+  height:         2rem;
+  border-radius:  var(--md-sys-shape-corner-full);
+  border:         2px solid var(--md-sys-color-outline);
+  background:     var(--md-sys-color-surface-container-highest);
+  cursor:         pointer;
+  position:       relative;
+  flex-shrink:    0;
+  transition:     background    var(--md-sys-motion-duration-short3)
+                                var(--md-sys-motion-easing-standard),
+                  border-color  var(--md-sys-motion-duration-short3)
+                                var(--md-sys-motion-easing-standard);
+
+  // Thumb
+  &::after {
+    content:       '';
+    position:      absolute;
+    top:           50%;
+    left:          0.125rem;           // 2px inset from track edge
+    width:         1rem;               // 16px — unselected thumb size
+    height:        1rem;
+    border-radius: 50%;
+    background:    var(--md-sys-color-outline);
+    transform:     translateY(-50%);
+    transition:    left       var(--md-sys-motion-duration-short3)
+                              var(--md-sys-motion-easing-emphasized),
+                  width      var(--md-sys-motion-duration-short3)
+                              var(--md-sys-motion-easing-emphasized),
+                  height     var(--md-sys-motion-duration-short3)
+                              var(--md-sys-motion-easing-emphasized),
+                  background var(--md-sys-motion-duration-short3)
+                              var(--md-sys-motion-easing-standard);
+  }
+
+  // Pressed — thumb grows to 28px
+  &:active::after {
+    width:  1.75rem;
+    height: 1.75rem;
+  }
+
+  // Checked (on) state
+  &:checked {
+    background:   var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+
+    &::after {
+      left:       calc(100% - 1.375rem);  // positioned to right side (thumb 22px + 2px gap)
+      width:      1.375rem;               // 22px — selected thumb size
+      height:     1.375rem;
+      background: var(--md-sys-color-on-primary);
+    }
+
+    &:active::after {
+      left:   calc(100% - 1.875rem);
+      width:  1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  // State layer on the thumb (via ::before on the label, approximated here)
+  // For a full ripple on the thumb, use behaviors.js
+  &:hover {
+    border-color: var(--md-sys-color-on-surface-variant);
+    &::after { background: var(--md-sys-color-on-surface-variant); }
+  }
+
+  &:checked:hover {
+    border-color: var(--md-sys-color-primary);
+    &::after { background: var(--md-sys-color-primary-container); }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+  }
+
+  // Disabled
+  &:disabled {
+    cursor:       not-allowed;
+    pointer-events: none;
+    background:   color-mix(in srgb, var(--md-sys-color-surface-container-highest) 12%, transparent);
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+
+    &::after {
+      background: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    }
+
+    &:checked {
+      background:   color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+      border-color: transparent;
+      &::after {
+        background: color-mix(in srgb, var(--md-sys-color-surface) 100%, transparent);
+      }
+    }
+  }
+}
+
+.md-switch-label {
+  display:     inline-flex;
+  align-items: center;
+  gap:         1rem;
+  cursor:      pointer;
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size:   var(--md-sys-typescale-body-large-size);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+  color:       var(--md-sys-color-on-surface);
+
+  &:has(.md-switch:disabled) {
+    cursor: not-allowed;
+    color:  color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+  }
+}

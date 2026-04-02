@@ -1,0 +1,19 @@
+{
+    "name": "VisualThemeFoundry",
+    "description": "Offline dependency-free web UI theming utility: visually select and customize color themes, select fonts and styles, select icon sets, view with Material Design 3 components, and export a ready-to-use theme package for use in your projects.",
+    "version": "1.0.0",
+    "runtimePolicy": {
+        "allowNodeModulesFolder": false,
+        "allowPackageManifests": false,
+        "externalUtilities": "vendored-under-_imports-only"
+    },
+    "scripts": {
+        "build:ts": "node _imports/typescript/lib/tsc.js --project tsconfig.json",
+        "watch:ts": "node _imports/typescript/lib/tsc.js --project tsconfig.json --watch"
+    },
+    "notes": [
+        "Do not add dependency-manager manifest files.",
+        "Do not restore managed dependency folders; vendor approved utility sources in _imports.",
+        "Runtime remains framework-free Vanilla JavaScript generated from TypeScript sources."
+    ]
+}

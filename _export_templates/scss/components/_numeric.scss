@@ -1,0 +1,81 @@
+// components/_numeric.scss — OpenType Numeric Font Variant Classes
+// ─────────────────────────────────────────────────────────────────────────────
+// Utility classes for font-variant-numeric OpenType features. Each class
+// targets a specific numeric rendering feature supported by qualifying fonts.
+//
+// These features only render visibly when the active font includes the
+// corresponding OpenType tables (tnum, onum, frac, ordn). Fallback is
+// standard number rendering — no layout breakage.
+//
+// ─── Classes ──────────────────────────────────────────────────────────────────
+//
+//   .md-numeric--tabular          → tabular-nums
+//     Fixed-width digits. All numerals occupy the same horizontal space,
+//     enabling vertical alignment in columns and tables.
+//
+//   .md-numeric--oldstyle         → oldstyle-nums
+//     Old-style (text) figures. Digits have ascenders/descenders like
+//     lowercase letters — 0, 1, 2 sit on baseline; 3, 4, 5, 7, 9 descend.
+//     Better for running text; less suitable for columns.
+//
+//   .md-numeric--tabular-oldstyle → tabular-nums oldstyle-nums
+//     Combined: fixed-width old-style figures. Uncommon but valid — tabular
+//     spacing with old-style rendering. Requires both OpenType tables.
+//
+//   .md-numeric--fractions        → diagonal-fractions
+//     Converts n/d slash notation (e.g. 1/2, 3/4) into properly sized
+//     diagonal fraction glyphs. Applied to markup-level fraction strings.
+//
+//   .md-numeric--ordinal          → ordinal
+//     Replaces ordinal suffixes (st, nd, rd, th) with superscript glyph
+//     variants: 1st → 1ˢᵗ. Requires OT ordn feature in the font.
+//
+//   .md-currency                  → lining-nums tabular-nums
+//     Combination for financial / currency display. Lining-nums ensures
+//     standard-height digits (no descenders); tabular-nums ensures column
+//     alignment. Use on price tables, invoices, and financial summaries.
+//
+// ─── Markup examples ──────────────────────────────────────────────────────────
+//
+//   <span class="md-numeric--tabular">$1,234.56</span>
+//
+//   <span class="md-numeric--fractions">1/2 cup, 3/4 tsp</span>
+//
+//   <span class="md-numeric--ordinal">Placed 1st out of 42nd finishers.</span>
+//
+//   <td class="md-currency">$4,299.00</td>
+//   <td class="md-currency">€2,890.50</td>
+//   <td class="md-currency">¥45,678</td>
+//
+// ─── Tokens consumed ──────────────────────────────────────────────────────────
+//   None — pure OpenType feature classes. Font and size are inherited.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.md-numeric--tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.md-numeric--oldstyle {
+  font-variant-numeric: oldstyle-nums;
+}
+
+.md-numeric--tabular-oldstyle {
+  font-variant-numeric: tabular-nums oldstyle-nums;
+}
+
+.md-numeric--fractions {
+  font-variant-numeric: diagonal-fractions;
+}
+
+.md-numeric--ordinal {
+  font-variant-numeric: ordinal;
+}
+
+// ─── Currency ─────────────────────────────────────────────────────────────────
+// Included when tabular-nums is selected in the Numeric Features panel.
+// Combines lining-nums (no descenders) + tabular-nums (column alignment)
+// for financial and price display.
+
+.md-currency {
+  font-variant-numeric: lining-nums tabular-nums;
+}

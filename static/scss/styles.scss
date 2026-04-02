@@ -1,0 +1,108 @@
+// static/scss/styles.scss — Preview stylesheet entry point
+// ─────────────────────────────────────────────────────────────────────────────
+// Compiled by server.py at startup via Dart Sass.
+// Output: static/css/styles.css — linked by index.html for the preview UI.
+//
+// This file forwards the full MD3 export template theme so that the preview
+// page renders with the same CSS that gets shipped in the export package.
+// Color token defaults (purple baseline) are overridden in real-time by
+// applyScheme() in index.html when the user selects a theme.
+// ─────────────────────────────────────────────────────────────────────────────
+
+@use '../../_export_templates/scss/theme';
+
+// ─── Numeric features card ───────────────────────────────────────────────────
+// Preview-only styles for the Numeric Features card above the typography studio.
+
+.numeric-features-card {
+  padding:       1.5rem;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.numeric-feature-row {
+  display:               grid;
+  grid-template-columns: 16rem 1fr;
+  align-items:           center;
+  gap:                   1rem;
+  padding:               0.45rem 0;
+  border-top:            1px solid var(--md-sys-color-outline-variant);
+
+  &:first-of-type { border-top: none; }
+
+  // Reuse the .row flex pattern from the component cards
+  label.row {
+    display:     flex;
+    align-items: center;
+    gap:         0.5rem;
+    cursor:      pointer;
+    user-select: none;
+  }
+}
+
+.numeric-feature-row--normal {
+  border-top:    none;
+  padding-bottom: 0.65rem;
+  margin-bottom:  0.15rem;
+}
+
+.numeric-feature-label {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.numeric-preview {
+  font-size:      1.15rem;
+  letter-spacing: 0.04em;
+  color:          var(--md-sys-color-on-surface);
+}
+
+.numeric-currency-note {
+  display:               grid;
+  grid-template-columns: 16rem 1fr;
+  align-items:           center;
+  gap:                   1rem;
+  padding:               0.65rem 0 0;
+  margin-top:            0.35rem;
+  border-top:            1px solid var(--md-sys-color-outline-variant);
+
+  &[hidden] { display: none; }
+
+  .numeric-currency-label {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+}
+
+// ─── Export button loading state ─────────────────────────────────────────────
+// Preview-only styles — not part of the export package.
+// .is-loading is toggled by exportThemePackage() in index.html.
+
+.btn-label {
+  transition: opacity var(--md-sys-motion-duration-short3, 200ms)
+                      var(--md-sys-motion-easing-standard, ease);
+}
+
+.btn-spinner {
+  position:        absolute;
+  inset:           0;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  opacity:         0;
+  pointer-events:  none;
+  transition:      opacity var(--md-sys-motion-duration-short3, 200ms)
+                           var(--md-sys-motion-easing-standard, ease);
+
+  .md-progress-circular {
+    width:  1.25rem;   // 20px — fits inside 40px button height
+    height: 1.25rem;
+  }
+
+  // Override token-colored strokes so the spinner reads against the filled
+  // button surface (inherits on-primary from the button's `color` value).
+  .md-progress-circular__indicator { stroke: currentColor; }
+  .md-progress-circular__track     { stroke: transparent; }
+}
+
+.md-btn.is-loading {
+  .btn-label   { opacity: 0; }
+  .btn-spinner { opacity: 1; }
+}
