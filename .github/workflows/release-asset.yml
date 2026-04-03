@@ -1,0 +1,89 @@
+name: Build And Upload Release Asset
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to package (for manual reruns)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  package-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+          fi
+
+          if [ -z "$TAG" ]; then
+            echo "Unable to resolve release tag." >&2
+            exit 1
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Build source asset from tag
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.tag.outputs.tag }}"
+          ZIP="VisualThemeFoundry-${TAG}.zip"
+
+          git rev-parse --verify "$TAG" >/dev/null
+          git checkout --force "$TAG"
+
+          mapfile -t TRACKED_FILES < <(git ls-files)
+          if [ "${#TRACKED_FILES[@]}" -eq 0 ]; then
+            echo "No tracked files found for tag $TAG" >&2
+            exit 1
+          fi
+
+          zip -q "$ZIP" "${TRACKED_FILES[@]}"
+
+          REPO_FILE_COUNT="${#TRACKED_FILES[@]}"
+          ZIP_FILE_COUNT="$(unzip -Z1 "$ZIP" | wc -l | tr -d ' ')"
+
+          if [ "$ZIP_FILE_COUNT" != "$REPO_FILE_COUNT" ]; then
+            echo "Release asset validation failed: zip contains $ZIP_FILE_COUNT files, expected $REPO_FILE_COUNT" >&2
+            exit 1
+          fi
+
+          if ! unzip -l "$ZIP" | awk '{print $4}' | grep -qx 'server.py'; then
+            echo "Release asset validation failed: server.py missing from $ZIP" >&2
+            exit 1
+          fi
+
+          sha256sum "$ZIP" > "$ZIP.sha256"
+
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release asset and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.tag.outputs.tag }}"
+          ZIP="${{ steps.package.outputs.zip }}"
+
+          gh release upload "$TAG" "$ZIP" "$ZIP.sha256" --clobber
