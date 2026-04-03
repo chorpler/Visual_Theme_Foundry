@@ -12,6 +12,10 @@ This project builds on open-source design and component work from the Material e
 - Additional fonts and icons may be added over time.
 - Licensing and attribution for added assets should be included with those assets when required.
 
+## Contributors
+
+- **chorpler** (GitHub) — identified the missing executable permission on Dart Sass binaries for macOS/Linux (reported via macOS test run, April 2026); submitted PR #1 which confirmed the issue and informed the fix landed in main.
+
 ## Legacy Upstream Attribution File
 
 A historical upstream attribution document is also retained in:
