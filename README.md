@@ -4,6 +4,9 @@ A local-first tool for previewing and exporting Material Design 3 themes, typogr
 
 Run it locally, configure your theme visually, export a clean scaffold package. No cloud, no npm, no framework lock-in.
 
+**Supported platforms:** Windows x64 · macOS x64 · macOS arm64 (Apple Silicon) · Linux x64 · Linux arm64.
+Requires Python 3.10+. Node.js required only for TypeScript compilation.
+
 ---
 
 ## What It Does

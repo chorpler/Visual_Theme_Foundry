@@ -1,0 +1,357 @@
+nano:Visual_Theme_Foundry admin$ python server.py
+2026-04-03 09:20:46,775 INFO material_web_builder: Serving /Users/admin/code/mike/Visual_Theme_Foundry on http://127.0.0.1:9000
+127.0.0.1 - - [03/Apr/2026 09:20:53] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:53] "GET /static/css/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /api/themes HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /api/fonts HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /api/icons/normalized HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /api/icons HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /api/theme/material-theme-v1.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/search-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/home-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/menu-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/close-01.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/add-circle-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/create-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/trash-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/cog-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/device-floppy-save-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/person-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/people-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/alarm-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/calendar-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/document-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/chatbubbles-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/download-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/folder-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/normalized/normal/share-outline-01-normal.svg HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:54] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:54] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:55] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:55] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:55] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:55] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:55] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:20:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:20:55] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:03] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:03] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:04] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:04] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:04] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:04] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:04] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:04] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:04] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:04] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:04] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:04] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:05] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:05] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:05] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:05] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /fonts/BadScript-Regular.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:09] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:09] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:09] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:12] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:12] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:12] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:12] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:12] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:12] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:12] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:12] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:12] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:12] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:12] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:12] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:24] "GET /api/theme/material-theme-v2.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /api/theme/material-theme-v3.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:27] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:27] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /api/theme/material-theme-v2.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:29] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:29] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:31] "GET /api/theme/material-theme-v1.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /api/theme/material-theme-v4.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:33] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:33] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /api/theme/material-theme-v5.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:35] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:35] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /api/theme/material-theme-v6.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:38] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:38] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:38] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:38] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:43] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:43] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:43] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:43] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:43] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:43] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:43] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:43] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:43] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:43] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:43] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:43] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /api/theme/material-theme-v1.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:47] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:47] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:50] "GET /api/theme/material-theme-v2.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /api/theme/material-theme-v3.json HTTP/1.1" 200 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:52] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:52] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:52] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:55] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:55] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:55] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:55] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:55] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:55] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:55] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:56] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:56] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:56] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:56] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:56] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:56] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:56] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:56] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:56] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:56] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:56] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:56] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:57] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:57] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:57] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:57] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:57] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:57] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:57] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:57] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:57] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:57] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:21:57] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:21:57] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/schedule.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/search-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/create-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/settings-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/home-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/alert-outline.svg HTTP/1.1" 404 -
+127.0.0.1 - - [03/Apr/2026 09:22:00] code 404, message File not found
+127.0.0.1 - - [03/Apr/2026 09:22:00] "GET /icons/schedule.svg HTTP/1.1" 404 -
+2026-04-03 09:22:27,755 ERROR material_web_builder: Export SCSS: unexpected error during compilation
+Traceback (most recent call last):
+  File "/Users/admin/code/mike/Visual_Theme_Foundry/server.py", line 585, in _compile_export_scss
+    code, output = _run_subprocess(
+                   ~~~~~~~~~~~~~~~^
+        [
+        ^
+    ...<6 lines>...
+        cwd=project_root,
+        ^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/admin/code/mike/Visual_Theme_Foundry/server.py", line 327, in _run_subprocess
+    result = subprocess.run(
+        command,
+    ...<2 lines>...
+        cwd=str(cwd) if cwd else None,
+    )
+  File "/Users/admin/.asdf/installs/python/3.14.2/lib/python3.14/subprocess.py", line 554, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/admin/.asdf/installs/python/3.14.2/lib/python3.14/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/admin/.asdf/installs/python/3.14.2/lib/python3.14/subprocess.py", line 1989, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+PermissionError: [Errno 13] Permission denied: '/Users/admin/code/mike/Visual_Theme_Foundry/_imports/dart-sass/src/dart.exe'
+127.0.0.1 - - [03/Apr/2026 09:22:27] "POST /api/export-package HTTP/1.1" 200 -

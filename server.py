@@ -41,7 +41,9 @@ Usage examples:
 Notes:
 - This script uses only the Python standard library.
 - Theme files are expected in color_themes/ with pattern material-theme-*.json.
-- Dart Sass binaries expected at _imports/dart-sass/src/dart.exe + sass.snapshot.
+- Dart Sass binaries expected under _imports/dart-sass/{platform}/ (dart[.exe] + sass.snapshot).
+  Supported platforms: win32-x64, darwin-x64, darwin-arm64, linux-x64, linux-arm64.
+  Platform is detected automatically at startup via sys.platform + platform.machine().
 - TypeScript compiler expected at _imports/typescript/lib/tsc.js.
 """
 
@@ -51,6 +53,7 @@ import argparse
 import io
 import json
 import logging
+import platform
 import re
 import shutil
 import subprocess
@@ -334,6 +337,59 @@ def _run_subprocess(command: list[str], cwd: Path | None = None) -> tuple[int, s
     return result.returncode, output
 
 
+def _resolve_dart_sass(project_root: Path) -> tuple[Path, Path] | None:
+    """
+    Resolve the Dart Sass binary and snapshot for the current platform.
+
+    Selects the correct subfolder under _imports/dart-sass/ using sys.platform
+    and platform.machine(). Returns None (with a warning log) if no matching
+    binary is found.
+
+    Platform subfolder mapping:
+        win32-x64    — Windows x64          (dart.exe)
+        darwin-x64   — macOS Intel          (dart)
+        darwin-arm64 — macOS Apple Silicon  (dart)
+        linux-x64    — Linux x64            (dart)
+        linux-arm64  — Linux arm64/aarch64  (dart)
+
+    Args:
+        project_root: Project root path.
+
+    Returns:
+        (dart_exe, snapshot) as a tuple of Paths if both files exist, else None.
+
+    Example:
+        result = _resolve_dart_sass(Path("."))
+        if result:
+            dart_exe, snapshot = result
+    """
+    machine = platform.machine().lower()
+    is_arm = machine in ("arm64", "aarch64")
+    current_platform = _sys.platform  # local var avoids Pylance static-true on win32 literal
+
+    if current_platform == "win32":
+        folder, bin_name = "win32-x64", "dart.exe"
+    elif current_platform == "darwin":
+        folder, bin_name = ("darwin-arm64" if is_arm else "darwin-x64"), "dart"
+    else:  # linux and other unix-like
+        folder, bin_name = ("linux-arm64" if is_arm else "linux-x64"), "dart"
+
+    dart_dir = project_root / "_imports" / "dart-sass" / folder
+    dart_exe = dart_dir / bin_name
+    snapshot = dart_dir / "sass.snapshot"
+
+    if not dart_exe.exists() or not snapshot.exists():
+        LOGGER.warning(
+            "Dart Sass: binary not found for platform %s/%s (expected %s)",
+            _sys.platform,
+            machine,
+            dart_dir,
+        )
+        return None
+
+    return dart_exe, snapshot
+
+
 def _check_and_compile_sass(project_root: Path) -> None:
     """
     Check static SCSS sources and compile to CSS when stale.
@@ -348,11 +404,12 @@ def _check_and_compile_sass(project_root: Path) -> None:
         _check_and_compile_sass(Path("."))
     """
     scss_dir = project_root / "static" / "scss"
-    dart_exe = project_root / "_imports" / "dart-sass" / "src" / "dart.exe"
-    snapshot = project_root / "_imports" / "dart-sass" / "src" / "sass.snapshot"
+    sass = _resolve_dart_sass(project_root)
 
-    if not dart_exe.exists() or not snapshot.exists() or not scss_dir.exists():
+    if sass is None or not scss_dir.exists():
         return
+
+    dart_exe, snapshot = sass
 
     targets = [
         (scss_dir / "console.scss", project_root / "static" / "css" / "console.css"),
@@ -563,11 +620,11 @@ def _compile_export_scss(
     import shutil
     import tempfile
 
-    dart_exe = project_root / "_imports" / "dart-sass" / "src" / "dart.exe"
-    snapshot = project_root / "_imports" / "dart-sass" / "src" / "sass.snapshot"
-    if not dart_exe.exists() or not snapshot.exists():
+    sass = _resolve_dart_sass(project_root)
+    if sass is None:
         LOGGER.warning("Export SCSS: Dart Sass not found — skipping css/theme.css compilation")
         return None
+    dart_exe, snapshot = sass
 
     templates_scss = project_root / EXPORT_TEMPLATES_DIR_NAME / "scss"
     if not templates_scss.exists():
