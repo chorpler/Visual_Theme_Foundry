@@ -1,6 +1,6 @@
 {
     "name": "VisualThemeFoundry",
-    "version": "1.4.1",
+    "version": "2.0.0",
     "description": "Offline dependency-free web UI theming utility: visually select and customize color themes, select fonts and styles, select icon sets, view with Material Design 3 components, and export a ready-to-use theme package for scaffolding use in your projects.",
     "author": "Mike (Lead Designer) — Forge Code (Lead Programmer)",
     "Contributors": [

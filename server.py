@@ -423,6 +423,7 @@ def _check_and_compile_sass(project_root: Path) -> None:
     targets = [
         (scss_dir / "console.scss", project_root / "static" / "css" / "console.css"),
         (scss_dir / "styles.scss", project_root / "static" / "css" / "styles.css"),
+        (scss_dir / "gallery.scss", project_root / "static" / "css" / "gallery.css"),
     ]
     sources = [source for source, _ in targets if source.exists()]
     if not sources:

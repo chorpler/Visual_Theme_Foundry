@@ -4,3 +4,9 @@ _docs/agent_notes_log.md
 _VisualThemeFoundry.code-workspace
 # Ignore local editor workspace settings.
 .vscode/settings.json
+
+# Ignore hidden git-prefixed folders (for untracked local-only content).
+.git*/
+
+# Local Copilot instructions should remain private.
+.github/copilot-instructions.md

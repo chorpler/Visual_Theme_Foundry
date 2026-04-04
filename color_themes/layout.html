@@ -1,0 +1,891 @@
+<!doctype html>
+<!--
+	Reusable gray/gray gallery layout template.
+
+	Purpose:
+	- Preserve the accepted structural mockup before live color wiring.
+	- Keep the diagnostic numbering, circled icon markers, and 2-column center layout.
+	- Serve as a reusable starter for future semantic gallery pages.
+
+	Notes:
+	- This file is intentionally static.
+	- All colors remain two-tone neutral placeholders.
+-->
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Theme Gallery Layout Template</title>
+		<style>
+			:root {
+				--gray-light: #b3b3b3;
+				--gray-dark: #5d5d5d;
+				--gray-border: var(--gray-dark);
+				--gray-ink: var(--gray-dark);
+				--gray-ink-inverse: var(--gray-light);
+				--radius-lg: 16px;
+				--radius-md: 12px;
+				--radius-sm: 8px;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100%;
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				line-height: 1.35;
+				background: var(--gray-light);
+				color: var(--gray-ink);
+			}
+
+			.gallery-shell {
+				max-width: 1360px;
+				margin: 0 auto;
+				padding: 20px;
+				display: grid;
+				gap: 20px;
+			}
+
+			.page-header {
+				background: var(--gray-dark);
+				color: var(--gray-ink-inverse);
+				padding: 20px;
+				border-radius: var(--radius-lg);
+				display: grid;
+				grid-template-columns: 1fr auto;
+				gap: 16px;
+				align-items: center;
+			}
+
+			.page-header h1 {
+				margin: 0;
+				font-size: clamp(1.65rem, 2.4vw, 2.1rem);
+				font-weight: 800;
+				letter-spacing: 0.02em;
+			}
+
+			.page-header p {
+				margin: 6px 0 0;
+				font-size: 0.98rem;
+				opacity: 0.92;
+			}
+
+			.kicker {
+				display: inline-block;
+				font-size: 0.76rem;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				margin: 0 0 8px;
+			}
+
+			.back-link {
+				display: inline-block;
+				text-decoration: none;
+				background: var(--gray-light);
+				color: var(--gray-ink);
+				padding: 10px 14px;
+				border-radius: 999px;
+				font-size: 0.88rem;
+				font-weight: 700;
+				border: 2px solid var(--gray-border);
+			}
+
+			.layout {
+				display: grid;
+				grid-template-columns: 320px 1fr;
+				gap: 20px;
+				align-items: start;
+			}
+
+			.panel {
+				background: var(--gray-dark);
+				color: var(--gray-ink-inverse);
+				border-radius: var(--radius-lg);
+				padding: 18px;
+			}
+
+			.panel h2,
+			.panel h3 {
+				margin: 0 0 12px;
+				font-size: 1.18rem;
+				font-weight: 800;
+				letter-spacing: 0.01em;
+			}
+
+			.panel-note {
+				margin: 0 0 10px;
+				font-size: 0.9rem;
+				opacity: 0.88;
+			}
+
+			.pair-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+				display: grid;
+				gap: 12px;
+			}
+
+			.pair-item {
+				position: relative;
+				display: grid;
+				grid-template-columns: auto 1fr;
+				gap: 12px;
+				align-items: center;
+				background: var(--gray-dark);
+				padding: 10px 10px 10px 18px;
+				border-radius: var(--radius-sm);
+			}
+
+			.legend-index-icon {
+				position: absolute;
+				left: -22px;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 30px;
+				height: 30px;
+				background: var(--gray-light);
+				border-radius: 50%;
+				padding: 2px;
+			}
+
+			.pair-dot-wrap {
+				display: flex;
+				gap: 4px;
+			}
+
+			.pair-dot {
+				width: 14px;
+				height: 14px;
+				border-radius: 50%;
+				border: 1px solid var(--gray-light);
+			}
+
+			.pair-dot.light {
+				background: var(--gray-light);
+			}
+
+			.pair-dot.dark {
+				background: var(--gray-dark);
+			}
+
+			.pair-label {
+				font-size: 0.93rem;
+				font-weight: 700;
+				letter-spacing: 0.01em;
+			}
+
+			.main-stage {
+				display: grid;
+				gap: 16px;
+			}
+
+			.stage-controls {
+				background: var(--gray-dark);
+				color: var(--gray-ink-inverse);
+				border-radius: var(--radius-lg);
+				padding: 14px;
+				border: 1px solid var(--gray-light);
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+
+			.placeholder-pill {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 8px 10px;
+				border-radius: 999px;
+				background: var(--gray-light);
+				color: var(--gray-ink);
+				font-size: 0.82rem;
+				font-weight: 700;
+				border: 1px solid var(--gray-border);
+			}
+
+			.catalog {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 14px;
+			}
+
+			.catalog-section {
+				background: var(--gray-dark);
+				color: var(--gray-ink-inverse);
+				padding: 14px;
+				border-radius: var(--radius-md);
+				border: 1px solid var(--gray-light);
+			}
+
+			.diagnostic-zone {
+				position: relative;
+				min-height: 94px;
+				margin: 0 0 12px;
+				border: 1px dashed var(--gray-light);
+				border-radius: var(--radius-sm);
+			}
+
+			.diag-row {
+				position: absolute;
+				left: 10px;
+				right: 10px;
+				height: 24px;
+			}
+
+			.diag-row.r1 {
+				top: -13px;
+			}
+
+			.diag-row.r2 {
+				top: 20px;
+			}
+
+			.diag-row.r3 {
+				top: 53px;
+			}
+
+			.diag-marker {
+				position: absolute;
+				left: 0;
+				top: 0;
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				padding: 3px 7px 3px 4px;
+				background: var(--gray-light);
+				color: var(--gray-dark);
+				border: 1px solid var(--gray-dark);
+				border-radius: 999px;
+				font-size: 0.74rem;
+				font-weight: 800;
+				letter-spacing: 0.03em;
+				white-space: nowrap;
+			}
+
+			.diag-marker::after {
+				content: "";
+				position: absolute;
+				left: calc(100% + 6px);
+				top: 50%;
+				width: 98px;
+				border-top: 2px dashed var(--gray-light);
+				transform: translateY(-50%);
+			}
+
+			.diag-marker-icon {
+				width: 14px;
+				height: 14px;
+				flex: 0 0 14px;
+			}
+
+			.diag-target {
+				position: absolute;
+				right: 0;
+				top: 2px;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: var(--gray-light);
+				border: 1px solid var(--gray-dark);
+			}
+
+			.diag-caption {
+				position: absolute;
+				right: 26px;
+				top: 4px;
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.02em;
+				white-space: nowrap;
+			}
+
+			.section-title {
+				margin: 0;
+				font-size: 1.04rem;
+				font-weight: 800;
+				letter-spacing: 0.01em;
+			}
+
+			.section-header {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin: 0 0 10px;
+			}
+
+			.section-index-icon {
+				width: 24px;
+				height: 24px;
+				flex: 0 0 24px;
+			}
+
+			.block-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+				gap: 10px;
+			}
+
+			.block {
+				background: var(--gray-light);
+				color: var(--gray-ink);
+				padding: 12px;
+				border-radius: var(--radius-sm);
+				font-size: 0.85rem;
+				font-weight: 600;
+				border: 1px solid var(--gray-border);
+				min-height: 64px;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				justify-content: center;
+				gap: 4px;
+			}
+
+			.semantic-name {
+				font-size: 0.83rem;
+				font-weight: 800;
+				line-height: 1.2;
+			}
+
+			.semantic-meta {
+				font-size: 0.72rem;
+				font-weight: 700;
+				line-height: 1.2;
+				opacity: 0.95;
+			}
+
+			@media (max-width: 1200px) {
+				.layout {
+					grid-template-columns: 280px 1fr;
+				}
+
+				.catalog {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 960px) {
+				.page-header {
+					grid-template-columns: 1fr;
+				}
+
+				.layout {
+					grid-template-columns: 1fr;
+				}
+
+				.diag-marker::after {
+					width: 56px;
+				}
+
+				.diag-caption {
+					font-size: 0.68rem;
+				}
+
+				.legend-index-icon {
+					left: -16px;
+					width: 24px;
+					height: 24px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="gallery-shell" aria-label="Semantic gallery layout template">
+			<header class="page-header">
+				<div>
+					<p class="kicker">Layout Template</p>
+					<h1>Theme Gallery Layout Draft</h1>
+					<p>
+						Static gray/gray placeholder with accepted proportions and callout
+						treatment.
+					</p>
+				</div>
+				<a class="back-link" href="/">Back to Main Builder</a>
+			</header>
+
+			<section class="layout">
+				<aside class="panel" aria-label="Complementary color pair map">
+					<h2>Left Rail: Pair Map</h2>
+					<p class="panel-note">
+						Each row maps to a numbered section in the center catalog.
+					</p>
+					<ul class="pair-list">
+						<li class="pair-item">
+							<img
+								class="legend-index-icon"
+								src="/_references/icons-original/circled-1.svg"
+								alt="Section 1"
+							/>
+							<div class="pair-dot-wrap">
+								<span class="pair-dot light"></span
+								><span class="pair-dot dark"></span>
+							</div>
+							<span class="pair-label">1. Primary / On Primary</span>
+						</li>
+						<li class="pair-item">
+							<img
+								class="legend-index-icon"
+								src="/_references/icons-original/circled-2.svg"
+								alt="Section 2"
+							/>
+							<div class="pair-dot-wrap">
+								<span class="pair-dot light"></span
+								><span class="pair-dot dark"></span>
+							</div>
+							<span class="pair-label">2. Secondary / On Secondary</span>
+						</li>
+						<li class="pair-item">
+							<img
+								class="legend-index-icon"
+								src="/_references/icons-original/circled-3.svg"
+								alt="Section 3"
+							/>
+							<div class="pair-dot-wrap">
+								<span class="pair-dot light"></span
+								><span class="pair-dot dark"></span>
+							</div>
+							<span class="pair-label">3. Tertiary / On Tertiary</span>
+						</li>
+						<li class="pair-item">
+							<img
+								class="legend-index-icon"
+								src="/_references/icons-original/circled-4.svg"
+								alt="Section 4"
+							/>
+							<div class="pair-dot-wrap">
+								<span class="pair-dot light"></span
+								><span class="pair-dot dark"></span>
+							</div>
+							<span class="pair-label">4. Surface / On Surface</span>
+						</li>
+						<li class="pair-item">
+							<img
+								class="legend-index-icon"
+								src="/_references/icons-original/circled-5.svg"
+								alt="Section 5"
+							/>
+							<div class="pair-dot-wrap">
+								<span class="pair-dot light"></span
+								><span class="pair-dot dark"></span>
+							</div>
+							<span class="pair-label">5. Surface Variant / On Variant</span>
+						</li>
+						<li class="pair-item">
+							<img
+								class="legend-index-icon"
+								src="/_references/icons-original/circled-6.svg"
+								alt="Section 6"
+							/>
+							<div class="pair-dot-wrap">
+								<span class="pair-dot light"></span
+								><span class="pair-dot dark"></span>
+							</div>
+							<span class="pair-label">6. Error / On Error</span>
+						</li>
+					</ul>
+				</aside>
+
+				<section class="main-stage" aria-label="Main component catalog">
+					<div class="stage-controls">
+						<span class="placeholder-pill">Theme Name Placeholder</span>
+						<span class="placeholder-pill"
+							>Variant Buttons Placeholder (6)</span
+						>
+						<span class="placeholder-pill">Prev/Next Theme Placeholder</span>
+						<span class="placeholder-pill"
+							>Main/Gallery Sync Toggle Placeholder</span
+						>
+					</div>
+
+					<div class="catalog">
+						<section class="catalog-section">
+							<div class="section-header">
+								<img
+									class="section-index-icon"
+									src="/_references/icons-original/circled-1.svg"
+									alt="Section 1"
+								/>
+								<h3 class="section-title">1. Primary Pair Usage</h3>
+							</div>
+							<div class="diagnostic-zone">
+								<div class="diag-row r1">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-1.svg"
+											alt=""
+										/>1-1</span
+									><span class="diag-caption">target: card heading</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r2">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-1.svg"
+											alt=""
+										/>1-2</span
+									><span class="diag-caption">target: action icon</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r3">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-1.svg"
+											alt=""
+										/>1-3</span
+									><span class="diag-caption">target: small label</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="block-grid">
+								<div class="block">
+									<span class="semantic-name">Card Heading / Primary</span
+									><span class="semantic-meta"
+										>self-label: uses semantic primary role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">[icon] Primary Action Icon</span
+									><span class="semantic-meta"
+										>self-label: icon tinted with primary role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">Label Small / On Primary</span
+									><span class="semantic-meta"
+										>self-label: foreground companion role</span
+									>
+								</div>
+							</div>
+						</section>
+						<section class="catalog-section">
+							<div class="section-header">
+								<img
+									class="section-index-icon"
+									src="/_references/icons-original/circled-2.svg"
+									alt="Section 2"
+								/>
+								<h3 class="section-title">2. Secondary Pair Usage</h3>
+							</div>
+							<div class="diagnostic-zone">
+								<div class="diag-row r1">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-2.svg"
+											alt=""
+										/>2-1</span
+									><span class="diag-caption">target: badge counter</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r2">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-2.svg"
+											alt=""
+										/>2-2</span
+									><span class="diag-caption">target: banner title</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r3">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-2.svg"
+											alt=""
+										/>2-3</span
+									><span class="diag-caption">target: utility icon</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="block-grid">
+								<div class="block">
+									<span class="semantic-name">Badge Counter / Secondary</span
+									><span class="semantic-meta"
+										>self-label: supporting emphasis role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name"
+										>Info Banner Title / On Secondary</span
+									><span class="semantic-meta"
+										>self-label: readable foreground role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name"
+										>[icon] Secondary Utility Icon</span
+									><span class="semantic-meta"
+										>self-label: icon role for secondary actions</span
+									>
+								</div>
+							</div>
+						</section>
+						<section class="catalog-section">
+							<div class="section-header">
+								<img
+									class="section-index-icon"
+									src="/_references/icons-original/circled-3.svg"
+									alt="Section 3"
+								/>
+								<h3 class="section-title">3. Tertiary Pair Usage</h3>
+							</div>
+							<div class="diagnostic-zone">
+								<div class="diag-row r1">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-3.svg"
+											alt=""
+										/>3-1</span
+									><span class="diag-caption">target: highlight title</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r2">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-3.svg"
+											alt=""
+										/>3-2</span
+									><span class="diag-caption">target: tag label</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r3">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-3.svg"
+											alt=""
+										/>3-3</span
+									><span class="diag-caption">target: divider marker</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="block-grid">
+								<div class="block">
+									<span class="semantic-name"
+										>Highlight Card Title / Tertiary</span
+									><span class="semantic-meta"
+										>self-label: decorative emphasis role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">Tag Label / On Tertiary</span
+									><span class="semantic-meta"
+										>self-label: contrast text role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">[icon] Accent Divider Marker</span
+									><span class="semantic-meta"
+										>self-label: tertiary icon marker role</span
+									>
+								</div>
+							</div>
+						</section>
+						<section class="catalog-section">
+							<div class="section-header">
+								<img
+									class="section-index-icon"
+									src="/_references/icons-original/circled-4.svg"
+									alt="Section 4"
+								/>
+								<h3 class="section-title">4. Surface Pair Usage</h3>
+							</div>
+							<div class="diagnostic-zone">
+								<div class="diag-row r1">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-4.svg"
+											alt=""
+										/>4-1</span
+									><span class="diag-caption">target: card heading</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r2">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-4.svg"
+											alt=""
+										/>4-2</span
+									><span class="diag-caption">target: modal title</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r3">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-4.svg"
+											alt=""
+										/>4-3</span
+									><span class="diag-caption">target: row icon</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="block-grid">
+								<div class="block">
+									<span class="semantic-name"
+										>Card Surface Heading / Surface</span
+									><span class="semantic-meta"
+										>self-label: base layer role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">Modal Title / On Surface</span
+									><span class="semantic-meta"
+										>self-label: primary readable text role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">[icon] Table Row Indicator</span
+									><span class="semantic-meta"
+										>self-label: neutral structure icon role</span
+									>
+								</div>
+							</div>
+						</section>
+						<section class="catalog-section">
+							<div class="section-header">
+								<img
+									class="section-index-icon"
+									src="/_references/icons-original/circled-5.svg"
+									alt="Section 5"
+								/>
+								<h3 class="section-title">5. Surface Variant Pair Usage</h3>
+							</div>
+							<div class="diagnostic-zone">
+								<div class="diag-row r1">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-5.svg"
+											alt=""
+										/>5-1</span
+									><span class="diag-caption">target: input label</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r2">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-5.svg"
+											alt=""
+										/>5-2</span
+									><span class="diag-caption">target: toggle caption</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r3">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-5.svg"
+											alt=""
+										/>5-3</span
+									><span class="diag-caption">target: list icon</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="block-grid">
+								<div class="block">
+									<span class="semantic-name"
+										>Input Label / Surface Variant</span
+									><span class="semantic-meta"
+										>self-label: muted container role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">Toggle Caption / On Variant</span
+									><span class="semantic-meta"
+										>self-label: companion foreground role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">[icon] List Affordance Icon</span
+									><span class="semantic-meta"
+										>self-label: variant supporting icon role</span
+									>
+								</div>
+							</div>
+						</section>
+						<section class="catalog-section">
+							<div class="section-header">
+								<img
+									class="section-index-icon"
+									src="/_references/icons-original/circled-6.svg"
+									alt="Section 6"
+								/>
+								<h3 class="section-title">6. Error Pair Usage</h3>
+							</div>
+							<div class="diagnostic-zone">
+								<div class="diag-row r1">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-6.svg"
+											alt=""
+										/>6-1</span
+									><span class="diag-caption">target: banner title</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r2">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-6.svg"
+											alt=""
+										/>6-2</span
+									><span class="diag-caption">target: validation text</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+								<div class="diag-row r3">
+									<span class="diag-marker"
+										><img
+											class="diag-marker-icon"
+											src="/_references/icons-original/circled-6.svg"
+											alt=""
+										/>6-3</span
+									><span class="diag-caption">target: destructive mark</span
+									><span class="diag-target" aria-hidden="true"></span>
+								</div>
+							</div>
+							<div class="block-grid">
+								<div class="block">
+									<span class="semantic-name">Error Banner Title / Error</span
+									><span class="semantic-meta"
+										>self-label: alert background role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name">Validation Text / On Error</span
+									><span class="semantic-meta"
+										>self-label: alert foreground role</span
+									>
+								</div>
+								<div class="block">
+									<span class="semantic-name"
+										>[icon] Destructive Action Mark</span
+									><span class="semantic-meta"
+										>self-label: danger icon role</span
+									>
+								</div>
+							</div>
+						</section>
+					</div>
+				</section>
+			</section>
+		</main>
+	</body>
+</html>

@@ -1,4 +1,4 @@
-# Visual Theme Foundry — v1.4.1
+# Visual Theme Foundry — v2.0.0
 
 A local-first tool for previewing and exporting Material Design 3 themes, typography, fonts, and icons for web applications.
 
@@ -20,6 +20,8 @@ Requires Python 3.10+. Node.js required only for TypeScript compilation.
 **Icon Role Browser** — Assign normalized SVG icons to 18 main-primary UI roles (Home, Search, Menu, Close, Add, Edit, Delete, Save, Settings, User, People, Notifications, Message, Calendar, Document, Folder, Upload/Download, Share). Choose glyph variant and stroke weight (light / normal / medium) per role. Drop your own SVGs into the drag-and-drop zone at the bottom — they are normalized and added to the inventory immediately.
 
 **Component preview** — Buttons, inputs, chips, cards, dialogs, tabs, navigation bars, and more. All themed live from the active scheme.
+
+**Theme Gallery** — A separate full-page component showcase (`/color_themes/theme-palette-gallery-test.html`) that demonstrates how Material Design 3 semantic color pairs behave across realistic UI compositions. Includes a hero carousel, five themed sections (Content, Forms, Feedback, Navigation & Overlay, Data), and SVG illustration recoloring tied to the active primary. Sync toggle keeps builder and gallery in lockstep.
 
 **Export** — Downloads a zip scaffold with the selected theme, typography, fonts, and the specific icons assigned to each role.
 
@@ -58,6 +60,27 @@ http://127.0.0.1:9000
 ## Project Name and Theme File
 
 Type a project name in the "Enter project name" field and press Enter (or tab away). The active theme JSON file is renamed on disk to `material-theme-{name}.json`.
+
+---
+
+## Theme Gallery
+
+Click **Theme Gallery** in the builder (top of the right panel) or navigate to `/color_themes/theme-palette-gallery-test.html` directly.
+
+The gallery is a Practical Blend component showcase — not a swatch map. It shows how semantic color pairs are used in realistic component compositions:
+
+| Section | What it demonstrates |
+| --- | --- |
+| Hero carousel | primary, surfaceContainerHigh, tertiaryContainer — three carousel slides with themed SVG illustrations |
+| Content | Card grid (primary / secondary / tertiary), list-group navigation sidebar |
+| Forms | Full POSH form — input, email, datalist, select/optgroup, textarea, output, fieldset/legend, validation states |
+| Feedback | Semantic alerts (info / success / warning / danger), spinners, progress bars, toast triggers, CSS tooltips |
+| Navigation & Overlay | Breadcrumb, pagination, dropdown, button variants, modal (native dialog), offcanvas panel |
+| Data | Striped/hover table, datetime-local, number, and range inputs |
+
+**Controls:** prev/next theme buttons, six scheme variant selectors, scheme badge pill. **Sync toggle** shares the active theme file and scheme with the builder page via `localStorage` (last-write-wins).
+
+SVG illustrations in `static/images/` are recolored at runtime to match the active primary — accent color replaced, grayscale ramp HSL-tinted to match primary hue at matching luminance.
 
 ---
 
