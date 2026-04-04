@@ -10,3 +10,7 @@ _VisualThemeFoundry.code-workspace
 
 # Local Copilot instructions should remain private.
 .github/copilot-instructions.md
+__pycache__/server.cpython-314.pyc
+tools/sync_claude_to_copilot_instructions.ps1
+.claude/settings.local.json
+__pycache__/server.cpython-314.pyc
