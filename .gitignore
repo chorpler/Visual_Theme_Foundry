@@ -1,6 +1,7 @@
 quarantine/
 _references/
 _docs/agent_notes_log.md
+koi-pond-animation.md
 _VisualThemeFoundry.code-workspace
 # Ignore local editor workspace settings.
 .vscode/settings.json

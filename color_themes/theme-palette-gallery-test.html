@@ -1344,6 +1344,336 @@
 			}
 		}
 	</style>
+
+	<!-- ===== KOI POND STYLES ===== -->
+	<style>
+		/* ═══════════════════════════════════════════════
+		   SECTION 6 — KOI POND
+		   ═══════════════════════════════════════════════ */
+
+		/* ── Bubble drift custom properties ── */
+		/* Registered so keyframe interpolation works on per-element values set by JS */
+		@property --bubble-dx { syntax: '<length>'; inherits: false; initial-value: 0px; }
+		@property --bubble-dy { syntax: '<length>'; inherits: false; initial-value: 0px; }
+
+		/* ── Container ── */
+		.koi-pond-section {
+			position: relative;
+			width: 100%;
+			aspect-ratio: 624 / 351;
+			overflow: hidden;
+			isolation: isolate;
+			container-type: inline-size;
+			container-name: koi-pond;
+			border-radius: 8px;
+			margin-bottom: 48px;
+			background: #707070; /* ambient pond floor — stylized ~55% light attenuation at 2.5 ft; shadow blobs sit darker on top */
+		}
+
+		/* ── Layer base: full-coverage absolute layers ── */
+		.pond-layer {
+			position: absolute;
+			inset: 0;
+			isolation: isolate;
+			pointer-events: none;
+		}
+		/* Full-scene SVG layers fill the container */
+		.pond-layer > svg {
+			width: 100%;
+			height: 100%;
+			display: block;
+		}
+
+		/* ── Depth-based rendering filters ── */
+		/* Deepest layers get underwater_murk + shimmer + blur; shallower layers get less */
+		#pond-layer-shadows {
+			filter: url(#water_shimmer) url(#underwater_murk) blur(3px);
+			opacity: 0.65;
+		}
+		/* brightness() applied after underwater_murk: darkens output proportionally to depth.
+		   White → #353535 ≈ 21% brightness at floor level; fish at depth attenuate toward that. */
+		/* drop-shadow placed last so it applies to the fully depth-processed fish image;
+		   shadow opacity decreases with depth — less ambient light = less visible shadow */
+		#pond-layer-koi04 { filter: url(#water_shimmer) blur(6px) url(#underwater_murk) brightness(0.44) drop-shadow(-8px -10px 6px rgba(0,0,0,0.2)); }
+		#pond-layer-koi03 { filter: url(#water_shimmer) blur(4px) url(#underwater_murk) brightness(0.56) drop-shadow(-8px -10px 5px rgba(0,0,0,0.3)); }
+		#pond-layer-koi02 { filter: url(#water_shimmer) blur(2px) brightness(0.8) drop-shadow(-8px -10px 4px rgba(0,0,0,0.4)); }
+		#pond-layer-koi01 { filter: url(#water_shimmer) blur(1px) brightness(0.8) drop-shadow(-8px -10px 3px rgba(0,0,0,0.55)); }
+		#pond-layer-ripples { filter: blur(10px) brightness(0.75); }
+		#pond-layer-lilyleaves { filter: drop-shadow(-30px -37px 3px rgba(0, 0, 0, 0.65)); }
+		#pond-layer-lilies  { filter: blur(1px) drop-shadow(0px -7px 1px rgba(0, 0, 0, 0.3)); }
+		#pond-layer-bamboo  {
+			filter: blur(0.25px) drop-shadow(-30px -37px 3px rgba(0, 0, 0, 0.75));
+		}
+
+		/* ── koi-01: full-scene SVG with built-in orbit rig ── */
+
+		/* Bob: animation on the injected SVG element shifts entire coordinate space */
+		#pond-layer-koi01 > svg {
+			animation: koi01-bob 22s ease-in-out infinite;
+		}
+		/* Dorsal lighting overlay: bright spine (top-center), shaded belly/edges.
+		   Fixed in layer space — acceptable at 300s orbit. mix-blend-mode: overlay
+		   brightens where white, darkens where black, neutral at 50% gray. */
+		#pond-layer-koi01::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background:
+				radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,0,0,0.7) 0%, transparent 100%),
+				radial-gradient(ellipse 50% 30% at 50% 75%, rgba(255,255,255,0.9) 0%, transparent 100%);
+			mix-blend-mode: overlay;
+			pointer-events: none;
+		}
+		/* Orbit: CSS rotate on outer group, using built-in crosshair center (SVG user coords) */
+		#koi01-orbit {
+			transform-origin: 187.635px 187.263px;
+			animation: koi01-orbit 300s linear infinite;
+		}
+		/* Fins: transform-box fill-box makes transform-origin relative to each element's bbox */
+		#koi01-fin-dorsal {
+			transform-box: fill-box;
+			transform-origin: 50% 100%; /* bottom-center = body attachment */
+			animation: fin-sway-a 30s ease-in-out infinite;
+		}
+		#koi01-fin-lower {
+			transform-box: fill-box;
+			transform-origin: 50% 0%; /* top-center = body attachment */
+			animation: fin-sway-b 30s ease-in-out infinite;
+			animation-delay: -8s;
+		}
+		#koi01-fin-tail {
+			transform-box: fill-box;
+			transform-origin: 0% 50%; /* left-center = where tail meets body */
+			animation: tail-sway 30s ease-in-out infinite;
+			animation-delay: -4s;
+		}
+
+		/* ── koi-02/03/04: fish positioner structure ──
+		   .koi-anchor     — positioned at orbit center; centering + vertical bob (translate property)
+		   .koi-orbit-frame — child of anchor; static heading via transform + orbit via translate property
+		   CSS 'translate' property composes with 'transform' independently (CSS Level 5).
+		   cqw units reference .koi-pond-section (container-name: koi-pond) — fully responsive.
+		   Orbit radii intentionally exceed pond bounds; overflow:hidden clips fish at frame edge,
+		   producing the swim-in / swim-out-of-frame effect. */
+		.koi-anchor {
+			position: absolute;
+			transform: translate(-50%, -50%); /* center fish at anchor point */
+		}
+		.koi-orbit-frame {
+			display: block;
+			width: 100%;
+		}
+		.koi-orbit-frame > svg {
+			width: 100%;
+			height: auto;
+			display: block;
+		}
+
+		/* koi-02: near-white, −0.5 ft depth */
+		#koi02-anchor {
+			left: 62%; top: 38%; width: 8%;
+			animation: koi-bob-med 28s ease-in-out infinite;
+		}
+		#koi02-orbit-frame {
+			transform: rotate(180deg); /* nose-up, facing right per spec */
+			animation: koi02-orbit 420s linear infinite;
+		}
+
+		/* koi-03: mid-gray, −0.8 ft depth */
+		#koi03-anchor {
+			left: 30%; top: 64%; width: 9%;
+			animation: koi-bob-slow 34s ease-in-out infinite;
+			animation-delay: -12s;
+		}
+		#koi03-orbit-frame {
+			transform: rotate(-135deg);
+			animation: koi03-orbit 540s linear infinite;
+			animation-delay: -180s;
+		}
+
+		/* koi-04: dark charcoal, −1.2 ft depth, largest, nose-left */
+		#koi04-anchor {
+			left: 50%; top: 52%; width: 14%;
+			animation: koi-bob-deep 40s ease-in-out infinite;
+			animation-delay: -18s;
+		}
+		#koi04-orbit-frame {
+			transform: scaleX(-1); /* flip horizontal: nose-left per spec */
+			animation: koi04-orbit 720s linear infinite;
+			animation-delay: -300s;
+		}
+
+		/* ── Ripples ── */
+		/* v1: group-level scale+fade. v2 candidate: per-path staggered MD3-style inner/outer waves */
+		.ripple-group {
+			transform-box: fill-box;
+			transform-origin: 50% 50%;
+			opacity: 0;
+			animation: ripple-expand 22s ease-out infinite;
+		}
+		#ripple-1 { animation-delay: 0s; }
+		#ripple-2 { animation-delay: -8s; }
+		#ripple-3 { animation-delay: -15s; }
+		#ripple-4 { animation-delay: -5s; }
+
+		/* ── Bamboo clusters ── */
+		/* transform-origin in SVG user coords (default transform-box: view-box for <g> elements) */
+		#bamboo-tl {
+			transform-origin: 15px 15px; /* near top-left frame entry */
+			animation: bamboo-sway-tl 8s ease-in-out infinite;
+		}
+		#bamboo-bl {
+			transform-origin: 15px 340px; /* near bottom-left frame entry */
+			animation: bamboo-sway-bl 11s ease-in-out infinite;
+			animation-delay: -3.5s;
+		}
+		#bamboo-tr {
+			transform-origin: 608px 15px; /* near top-right frame entry */
+			animation: bamboo-sway-tr 9.5s ease-in-out infinite;
+			animation-delay: -5.5s;
+		}
+
+		/* ── Bubbles ── */
+		/* .bubble-rising toggled by JS; --bubble-duration / --bubble-dx / --bubble-dy set per-bubble by JS */
+		.bubble-rising {
+			animation: bubble-rise var(--bubble-duration, 4s) ease-in forwards;
+		}
+
+		/* ── Parallax (--pond-mx / --pond-my set by JS mousemove) ── */
+		#pond-layer-bamboo {
+			translate: calc(var(--pond-mx, 0) * 24px) calc(var(--pond-my, 0) * 12px);
+			transition: translate 80ms linear;
+		}
+		#pond-layer-lilyleaves,
+		#pond-layer-lilies {
+			translate: calc(var(--pond-mx, 0) * 12px) calc(var(--pond-my, 0) * 6px);
+			transition: translate 80ms linear;
+		}
+
+		/* ═══════════════════════════════════════════════
+		   KOI POND — @keyframes
+		   ═══════════════════════════════════════════════ */
+
+		@keyframes koi01-orbit {
+			from { transform: rotate(0deg); }
+			to   { transform: rotate(360deg); }
+		}
+
+		/* Bob applied to SVG element: shifts entire coordinate space up/down */
+		@keyframes koi01-bob {
+			0%, 100% { transform: translateY(0); }
+			50%       { transform: translateY(-1.5%); }
+		}
+
+		/* Fin sway — lazy push forward, quick snap return (asymmetric timing) */
+		@keyframes fin-sway-a {
+			0%   { transform: rotate(0deg); }
+			30%  { transform: rotate(18deg); }
+			65%  { transform: rotate(-20deg); }
+			100% { transform: rotate(0deg); }
+		}
+		@keyframes fin-sway-b {
+			0%   { transform: rotate(0deg); }
+			30%  { transform: rotate(-18deg); }
+			65%  { transform: rotate(20deg); }
+			100% { transform: rotate(0deg); }
+		}
+		@keyframes tail-sway {
+			0%   { transform: rotate(0deg); }
+			25%  { transform: rotate(20deg); }
+			50%  { transform: rotate(0deg); }
+			75%  { transform: rotate(-20deg); }
+			100% { transform: rotate(0deg); }
+		}
+
+		/* koi-02/03/04 elliptical orbits — 8-point parametric approximation.
+		   CSS 'translate' property animates independently from the static 'transform'
+		   heading on .koi-orbit-frame. cos(45°) = sin(45°) = 0.7071. */
+
+		/* koi-02: rx=30cqw, ry=20cqw */
+		@keyframes koi02-orbit {
+			0%    { translate: 30cqw 0; }
+			12.5% { translate: 21.21cqw 14.14cqw; }
+			25%   { translate: 0cqw 20cqw; }
+			37.5% { translate: -21.21cqw 14.14cqw; }
+			50%   { translate: -30cqw 0; }
+			62.5% { translate: -21.21cqw -14.14cqw; }
+			75%   { translate: 0cqw -20cqw; }
+			87.5% { translate: 21.21cqw -14.14cqw; }
+			100%  { translate: 30cqw 0; }
+		}
+		/* koi-03: rx=38cqw, ry=26cqw */
+		@keyframes koi03-orbit {
+			0%    { translate: 38cqw 0; }
+			12.5% { translate: 26.87cqw 18.38cqw; }
+			25%   { translate: 0cqw 26cqw; }
+			37.5% { translate: -26.87cqw 18.38cqw; }
+			50%   { translate: -38cqw 0; }
+			62.5% { translate: -26.87cqw -18.38cqw; }
+			75%   { translate: 0cqw -26cqw; }
+			87.5% { translate: 26.87cqw -18.38cqw; }
+			100%  { translate: 38cqw 0; }
+		}
+		/* koi-04: rx=50cqw, ry=35cqw — largest orbit, extends fully off-screen at arc extremes */
+		@keyframes koi04-orbit {
+			0%    { translate: 50cqw 0; }
+			12.5% { translate: 35.36cqw 24.75cqw; }
+			25%   { translate: 0cqw 35cqw; }
+			37.5% { translate: -35.36cqw 24.75cqw; }
+			50%   { translate: -50cqw 0; }
+			62.5% { translate: -35.36cqw -24.75cqw; }
+			75%   { translate: 0cqw -35cqw; }
+			87.5% { translate: 35.36cqw -24.75cqw; }
+			100%  { translate: 50cqw 0; }
+		}
+
+		/* Vertical bob — CSS 'translate' property on .koi-anchor; composes with 'transform' */
+		@keyframes koi-bob-med {
+			0%, 100% { translate: 0 0; }
+			50%       { translate: 0 -1cqw; }
+		}
+		@keyframes koi-bob-slow {
+			0%, 100% { translate: 0 0; }
+			50%       { translate: 0 -0.8cqw; }
+		}
+		@keyframes koi-bob-deep {
+			0%, 100% { translate: 0 0; }
+			40%       { translate: 0 -0.6cqw; }
+		}
+
+		@keyframes ripple-expand {
+			0%   { transform: scale(0.15); opacity: 0; }
+			8%   { opacity: 1; }
+			80%  { transform: scale(1.8); opacity: 0.12; }
+			100% { transform: scale(1.8); opacity: 0; }
+		}
+
+		/* Bamboo sway — ±5-8° about frame-edge entry point */
+		@keyframes bamboo-sway-tl {
+			0%, 100% { transform: rotate(0deg); }
+			50%       { transform: rotate(-7deg); }
+		}
+		@keyframes bamboo-sway-bl {
+			0%, 100% { transform: rotate(0deg); }
+			50%       { transform: rotate(8deg); }
+		}
+		@keyframes bamboo-sway-tr {
+			0%, 100% { transform: rotate(0deg); }
+			50%       { transform: rotate(6deg); }
+		}
+
+		/* Bubble drift — top-down view: bubbles don't rise up-screen.
+		   Instead they drift inward toward the vanishing point (pond center) as they rise
+		   through the water column — parallax effect of viewing through water.
+		   --bubble-dx / --bubble-dy: per-bubble inward vectors set by JS (initBubbleQueue).
+		   @property declarations above enable smooth interpolation of these custom lengths. */
+		@keyframes bubble-rise {
+			0%   { translate: 0 0; opacity: 0.05; }
+			40%  { opacity: 0.2; }
+			85%  { translate: var(--bubble-dx, 0px) var(--bubble-dy, 0px); opacity: 0.08; }
+			100% { translate: var(--bubble-dx, 0px) var(--bubble-dy, 0px); opacity: 0; }
+		}
+	</style>
 </head>
 <body>
 	<!-- ===== STICKY HEADER ===== -->
@@ -1380,6 +1710,7 @@
 					<a href="#section-feedback" class="nav-link" data-section="section-feedback">Feedback</a>
 					<a href="#section-nav" class="nav-link" data-section="section-nav">Navigation</a>
 					<a href="#section-data" class="nav-link" data-section="section-data">Data</a>
+					<a href="#section-pond" class="nav-link" data-section="section-pond">Pond</a>
 				</div>
 			</div>
 		</nav>
@@ -1849,6 +2180,99 @@
 			</div>
 			<p class="token-hint">primary (focus ring, range accent) &middot; outlineVariant (border)</p>
 		</section>
+
+		<!-- === SECTION 6: KOI POND === -->
+		<section class="gallery-section" id="section-pond">
+			<h2 class="section-heading">Koi Pond</h2>
+			<p class="section-sub">Layered SVG scene with CSS animation &mdash; depth-based blur, orbital fish paths, procedural water shimmer, and parallax. Fish swim beyond the frame boundary; pond clips at edge.</p>
+
+			<!-- Headless SVG filter library — zero layout space, fully parsed by browser.
+			     Filters defined here are available via filter:url(#id) anywhere in the DOM. -->
+			<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;overflow:hidden">
+				<defs>
+					<!-- Water shimmer: feTurbulence drives a displacement map; seed animated
+					     via SVG animate element for continuous self-animating distortion -->
+					<filter id="water_shimmer" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+						<feTurbulence type="turbulence" baseFrequency="0.015 0.02" numOctaves="2" seed="1" result="turbulence">
+							<animate attributeName="seed" from="1" to="8" dur="4s" repeatCount="indefinite"/>
+						</feTurbulence>
+						<feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+					</filter>
+					<!-- Underwater murk: feColorMatrix simulates red-wavelength absorption at depth.
+					     Matrix rows = R G B A: red channel reduced, blue-green amplified, bias adds cool tint. -->
+					<!-- Underwater murk: half the original blue boost, then 20% desaturation across all
+					     channels, then red-wavelength absorption (×0.7 on red — baked into matrix).
+					     Net: R×0.45, G×0.64+0.08 bias, B×0.88+0.08 bias. -->
+					<filter id="underwater_murk" color-interpolation-filters="sRGB">
+						<feColorMatrix type="matrix"
+							values="0.45 0    0    0  0
+							        0    0.64 0    0  0.08
+							        0    0    0.88 0  0.08
+							        0    0    0    1  0"/>
+					</filter>
+				</defs>
+			</svg>
+
+			<!-- Koi Pond scene — layers in DOM order (first = bottom/deepest, last = top/closest)
+			     Full-scene layers: SVG injected as innerHTML of .pond-layer by initKoiPond()
+			     Fish-only layers (koi-02/03/04): SVG injected into .koi-orbit-frame by initKoiPond() -->
+			<div class="koi-pond-section" id="koiPondScene">
+
+				<!-- Layer 1 (bottom): Pond floor shadows — deepest, −1.45 ft -->
+				<div class="pond-layer" id="pond-layer-shadows"
+				     data-pond-src="/static/images/Koi_Pond/working/pond_bottom_shadows.svg"></div>
+
+				<!-- Layer 2: koi-04 — deepest koi, dark charcoal, −1.2 ft -->
+				<div class="pond-layer" id="pond-layer-koi04">
+					<div class="koi-anchor" id="koi04-anchor">
+						<div class="koi-orbit-frame" id="koi04-orbit-frame"
+						     data-pond-src="/static/images/Koi_Pond/working/koi-04.svg"></div>
+					</div>
+				</div>
+
+				<!-- Layer 3: koi-03 — mid-depth, mid-gray, −0.8 ft -->
+				<div class="pond-layer" id="pond-layer-koi03">
+					<div class="koi-anchor" id="koi03-anchor">
+						<div class="koi-orbit-frame" id="koi03-orbit-frame"
+						     data-pond-src="/static/images/Koi_Pond/working/koi-03.svg"></div>
+					</div>
+				</div>
+
+				<!-- Layer 4: koi-02 — near-white, −0.5 ft -->
+				<div class="pond-layer" id="pond-layer-koi02">
+					<div class="koi-anchor" id="koi02-anchor">
+						<div class="koi-orbit-frame" id="koi02-orbit-frame"
+						     data-pond-src="/static/images/Koi_Pond/working/koi-02.svg"></div>
+					</div>
+				</div>
+
+				<!-- Layer 5: koi-01 — shallowest, full scene SVG with built-in orbit rig, −0.2 ft -->
+				<div class="pond-layer" id="pond-layer-koi01"
+				     data-pond-src="/static/images/Koi_Pond/working/koi-01.svg"></div>
+
+				<!-- Layer 6: Bubbles — rising through water column, 0 to −1.5 ft -->
+				<div class="pond-layer" id="pond-layer-bubbles"
+				     data-pond-src="/static/images/Koi_Pond/working/bubbles.svg"></div>
+
+				<!-- Layer 7: Ripples — water surface interaction plane, 0.0 ft -->
+				<div class="pond-layer" id="pond-layer-ripples"
+				     data-pond-src="/static/images/Koi_Pond/working/ripples.svg"></div>
+
+				<!-- Layer 8: Lily pads — at surface tension, +0.05 ft -->
+				<div class="pond-layer" id="pond-layer-lilyleaves"
+				     data-pond-src="/static/images/Koi_Pond/working/water_lilies_leaves.svg"></div>
+
+				<!-- Layer 9: Lily flowers — just above surface, +0.2 ft -->
+				<div class="pond-layer" id="pond-layer-lilies"
+				     data-pond-src="/static/images/Koi_Pond/working/water_lilies.svg"></div>
+
+				<!-- Layer 10 (top): Bamboo leaves — foreground overlay, +2.0 ft, parallax -->
+				<div class="pond-layer" id="pond-layer-bamboo"
+				     data-pond-src="/static/images/Koi_Pond/working/bamboo-leaves.svg"></div>
+
+			</div>
+			<!-- end .koi-pond-section -->
+		</section>
 	</main>
 	<!-- end .gallery-main -->
 
@@ -1885,6 +2309,7 @@
 				<li><a href="#section-feedback" data-offcanvas-close>Feedback &amp; State</a></li>
 				<li><a href="#section-nav" data-offcanvas-close>Navigation &amp; Overlay</a></li>
 				<li><a href="#section-data" data-offcanvas-close>Data</a></li>
+				<li><a href="#section-pond" data-offcanvas-close>Koi Pond</a></li>
 			</ul>
 		</nav>
 	</aside>
@@ -2118,6 +2543,280 @@
 			});
 		}
 
+		// ===== KOI POND =====
+
+		/**
+		 * POND_GRAY_RAMP
+		 * Gray hex values found across the 10 pond SVG working copies.
+		 * Distinct from GRAY_RAMP (gallery icons); these cover the pond's specific palette.
+		 * On scheme change, each value is replaced with a tinted equivalent at matching luminance.
+		 *
+		 * Values (19 total, darkest → lightest):
+		 *   #010101 — near-black (deep shadow)
+		 *   #302F2F — very dark warm gray (bamboo, ripple fills)
+		 *   #4D4D4D — dark mid-gray
+		 *   #515151 — dark gray (bamboo, koi-02 detail)
+		 *   #636464 — mid-dark gray
+		 *   #706F6F — mid-dark gray (ripple-2 stroke, +25% from #302F2F)
+		 *   #747474 — mid gray (ripples, koi body)
+		 *   #838385 — mid-light gray
+		 *   #B4B4B4 — light gray (ripple-1/4 stroke, +25% from #747474)
+		 *   #B7B7B7 — light gray
+		 *   #CECECD — light warm gray
+		 *   #CFD0D0 — light gray (ripple highlights)
+		 *   #D2D3D3 — near-white gray (koi-03 light areas)
+		 *   #E1E1E1 — pale gray (koi-04 spot markings)
+		 *   #E3E3E3 — pale gray (koi-01 fin/scale highlights)
+		 *   #E6E6E5 — very light gray (highlights)
+		 *   #EDEDED — near-white (koi-02 light patches)
+		 *   #F2F2F2 — near-white (koi-02 light patches)
+		 *   #F3F3F3 — near-white (lily/koi bright areas)
+		 */
+		const POND_GRAY_RAMP = [
+			"#010101",
+			"#302F2F",
+			"#4D4D4D",
+			"#515151",
+			"#636464",
+			"#706F6F",
+			"#747474",
+			"#838385",
+			"#B4B4B4",
+			"#B7B7B7",
+			"#CECECD",
+			"#CFD0D0",
+			"#D2D3D3",
+			"#E1E1E1",
+			"#E3E3E3",
+			"#E6E6E5",
+			"#EDEDED",
+			"#F2F2F2",
+			"#F3F3F3",
+		];
+
+		/**
+		 * KOI_POND_ACCENT2
+		 * Secondary accent hex used in koi-01.svg and water_lilies.svg.
+		 * Distinct from SVG_ACCENT_HEX (#0E9DD4) used in gallery icons.
+		 * Both are replaced with the active primary color on scheme change.
+		 */
+		const KOI_POND_ACCENT2 = "#139DD4";
+
+		/**
+		 * POND_LAYERS
+		 * Layer descriptor array; defines injection target and SVG source for each pond layer.
+		 *   id          — ID of the .pond-layer div (or orbit frame for fish-only SVGs)
+		 *   targetAttr  — which element carries data-pond-src: 'layer' = .pond-layer div,
+		 *                 'orbit' = .koi-orbit-frame div (fish-only SVGs)
+		 *
+		 * DOM order (first = bottommost, last = topmost) must match the HTML layer order.
+		 */
+		const POND_LAYERS = [
+			{ id: "pond-layer-shadows",   target: "layer" },
+			{ id: "pond-layer-koi04",     target: "orbit", frameId: "koi04-orbit-frame" },
+			{ id: "pond-layer-koi03",     target: "orbit", frameId: "koi03-orbit-frame" },
+			{ id: "pond-layer-koi02",     target: "orbit", frameId: "koi02-orbit-frame" },
+			{ id: "pond-layer-koi01",     target: "layer" },
+			{ id: "pond-layer-bubbles",   target: "layer" },
+			{ id: "pond-layer-ripples",   target: "layer" },
+			{ id: "pond-layer-lilyleaves",target: "layer" },
+			{ id: "pond-layer-lilies",    target: "layer" },
+			{ id: "pond-layer-bamboo",    target: "layer" },
+		];
+
+		/**
+		 * applyPondTint
+		 * Applies color replacement to raw SVG text for pond layers.
+		 *   - Replaces KOI_POND_ACCENT2 and SVG_ACCENT_HEX with primaryHex
+		 *   - Replaces each POND_GRAY_RAMP entry with a tinted equivalent via tintedGray()
+		 *
+		 * @param {string} svgText    - Raw SVG markup text
+		 * @param {string} primaryHex - Active scheme primary color (#rrggbb)
+		 * @returns {string} Recolored SVG text
+		 */
+		function applyPondTint(svgText, primaryHex) {
+			const { r, g, b } = hexToRgb(primaryHex);
+			const primaryHsl = rgbToHsl(r, g, b);
+			let out = svgText;
+			// Replace both accent variants with active primary
+			out = out.replace(new RegExp(KOI_POND_ACCENT2, "gi"), primaryHex);
+			out = out.replace(new RegExp(SVG_ACCENT_HEX, "gi"), primaryHex);
+			// Replace each pond gray with a luminance-matched tinted tone
+			POND_GRAY_RAMP.forEach((gray) => {
+				out = out.replace(new RegExp(gray, "gi"), tintedGray(gray, primaryHsl));
+			});
+			return out;
+		}
+
+		/**
+		 * initKoiPond
+		 * Fetches all pond SVG layers, tints them with the active primary color, and injects
+		 * them as inline SVG into their target DOM elements. Inline injection (vs blob URL on
+		 * <img>) is required so that CSS animations can target internal SVG elements by ID
+		 * (e.g. #koi01-orbit, .ripple-group, .bamboo-cluster).
+		 *
+		 * Called once on page load (from initializeGallery) and on every scheme change
+		 * (from renderTheme). Aborts silently if #koiPondScene is not in the DOM.
+		 *
+		 * @param {string} primaryHex - Active scheme primary color (#rrggbb)
+		 */
+		async function initKoiPond(primaryHex) {
+			const scene = document.getElementById("koiPondScene");
+			if (!scene) return;
+
+			await Promise.all(
+				POND_LAYERS.map(async ({ id, target, frameId }) => {
+					// Determine the injection target element and SVG source URL
+					const layerEl = document.getElementById(id);
+					if (!layerEl) return;
+
+					const injectEl = target === "orbit"
+						? document.getElementById(frameId)
+						: layerEl;
+					if (!injectEl) return;
+
+					const src = injectEl.dataset.pondSrc
+						|| (target === "layer" ? layerEl.dataset.pondSrc : null);
+					if (!src) return;
+
+					try {
+						const res = await fetch(src);
+						if (!res.ok) throw new Error(`HTTP ${res.status}`);
+						const svgText = await res.text();
+						injectEl.innerHTML = applyPondTint(svgText, primaryHex);
+					} catch (e) {
+						console.warn(`[koi-pond] SVG inject failed: ${src}`, e);
+					}
+				}),
+			);
+
+			// Re-init bubble queue on every tint update: SVG re-injection replaces the
+			// bubble path DOM nodes, so the prior queue's element refs are stale.
+			// Any ghost setTimeout chains on detached nodes harmlessly fire and no-op.
+			initBubbleQueue(scene);
+			// Parallax uses an event listener — only attach once to avoid stacking.
+			if (!scene._parallaxInit) {
+				scene._parallaxInit = true;
+				initPondParallax(scene);
+			}
+		}
+
+		/**
+		 * initBubbleQueue
+		 * Runs a round-robin bubble rise animation across the 15 bubble paths in bubbles.svg.
+		 * Each bubble gets a randomized rise duration (3–6 s) and a randomized delay
+		 * between sequential launches (0.7–2 s). After each animation completes, the bubble
+		 * returns to the queue and waits its turn again.
+		 *
+		 * Technique:
+		 *   - Assigns .bubble-rising class to trigger the @keyframes bubble-rise CSS animation
+		 *   - Sets --bubble-duration on the element so each bubble has a unique timing
+		 *   - Uses animationend event + setTimeout for queueing; no setInterval polling
+		 *
+		 * @param {Element} scene - #koiPondScene container (used as query scope)
+		 */
+		function initBubbleQueue(scene) {
+			const bubbleLayer = scene.querySelector("#pond-layer-bubbles");
+			if (!bubbleLayer) return;
+
+			// Wait a tick so injected SVG is in DOM before querying bubble paths
+			requestAnimationFrame(() => {
+				const bubbles = Array.from(bubbleLayer.querySelectorAll("[id^='bubble-']"));
+				if (!bubbles.length) return;
+
+				// Shuffle so burst order varies on each page load
+				for (let i = bubbles.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[bubbles[i], bubbles[j]] = [bubbles[j], bubbles[i]];
+				}
+
+				// Per-bubble inward drift vector (top-down parallax: bubbles appear to
+				// shift toward the vanishing point / pond center as they rise through water).
+				// getBBox() returns coords in SVG user space (624 × 351 viewBox).
+				// Drift magnitude: ~40 SVG units = ~6.4cqw at typical width.
+				const SVG_CX = 312, SVG_CY = 175.5, DRIFT_SVG_UNITS = 20;
+				bubbles.forEach((bubble) => {
+					try {
+						const bbox = bubble.getBBox();
+						const bx = bbox.x + bbox.width / 2;
+						const by = bbox.y + bbox.height / 2;
+						const dx = SVG_CX - bx;
+						const dy = SVG_CY - by;
+						const dist = Math.sqrt(dx * dx + dy * dy);
+						if (dist > 0) {
+							// Express drift in cqw (624 SVG units = 100cqw container width)
+							const dxCqw = ((dx / dist * DRIFT_SVG_UNITS) / 624 * 100).toFixed(2);
+							const dyCqw = ((dy / dist * DRIFT_SVG_UNITS) / 624 * 100).toFixed(2);
+							bubble.style.setProperty("--bubble-dx", dxCqw + "cqw");
+							bubble.style.setProperty("--bubble-dy", dyCqw + "cqw");
+						}
+					} catch (_) { /* getBBox may throw if element not yet rendered */ }
+				});
+
+				let queueIndex = 0;
+
+				function launchNext() {
+					const bubble = bubbles[queueIndex % bubbles.length];
+					queueIndex++;
+
+					// Duration: 3–6 s, scaled by bubble size (smaller = slower, represents depth)
+					const duration = (3 + Math.random() * 3).toFixed(2) + "s";
+					bubble.style.setProperty("--bubble-duration", duration);
+					bubble.classList.remove("bubble-rising");
+					// Force reflow so CSS animation restarts cleanly
+					void bubble.getBoundingClientRect();
+					bubble.classList.add("bubble-rising");
+
+					bubble.addEventListener("animationend", function onEnd() {
+						bubble.removeEventListener("animationend", onEnd);
+						bubble.classList.remove("bubble-rising");
+						// Delay 0.7–2 s before next bubble launches
+						const delay = 700 + Math.random() * 1300;
+						setTimeout(launchNext, delay);
+					}, { once: true });
+				}
+
+				// Stagger initial burst so not all bubbles start simultaneously
+				bubbles.forEach((_, i) => {
+					setTimeout(launchNext, i * (800 + Math.random() * 600));
+				});
+			});
+		}
+
+		/**
+		 * initPondParallax
+		 * Tracks mousemove over the pond scene and writes normalized offset values
+		 * (−1 to +1) into CSS custom properties --pond-mx and --pond-my on the scene element.
+		 * CSS translate on #pond-layer-bamboo and lily layers picks these up to create
+		 * depth-appropriate parallax motion.
+		 *
+		 * Desktop-only (no mobile/gyroscope branch). Uses requestAnimationFrame throttle
+		 * so mousemove events don't trigger layout recalc every frame.
+		 *
+		 * @param {Element} scene - #koiPondScene container
+		 */
+		function initPondParallax(scene) {
+			let rafPending = false;
+			scene.addEventListener("mousemove", (e) => {
+				if (rafPending) return;
+				rafPending = true;
+				requestAnimationFrame(() => {
+					rafPending = false;
+					const rect = scene.getBoundingClientRect();
+					const cx = rect.left + rect.width / 2;
+					const cy = rect.top + rect.height / 2;
+					const mx = (e.clientX - cx) / (rect.width / 2);
+					const my = (e.clientY - cy) / (rect.height / 2);
+					scene.style.setProperty("--pond-mx", mx.toFixed(4));
+					scene.style.setProperty("--pond-my", my.toFixed(4));
+				});
+			});
+			scene.addEventListener("mouseleave", () => {
+				scene.style.setProperty("--pond-mx", "0");
+				scene.style.setProperty("--pond-my", "0");
+			});
+		}
+
 		// ===== SYSTEM THEME DETECTION =====
 		function preferredSchemeName(themeData) {
 			const names = Object.keys((themeData && themeData.schemes) || {});
@@ -2229,6 +2928,7 @@
 			applySemanticTokens(scheme);
 			renderSchemeButtons();
 			refreshSvgImages(scheme.primary || "#4c5c92").catch(console.warn);
+			initKoiPond(scheme.primary || "#4c5c92").catch(console.warn);
 			writeSharedState();
 			setStatus(`Loaded ${activeFile} \u00b7 ${splitSchemeLabel(state.schemeName)}`);
 		}
