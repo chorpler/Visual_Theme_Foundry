@@ -2007,6 +2007,16 @@
 					colorToken: "--md-sys-color-secondary",
 					previewText: "Caption note",
 				},
+				{
+					id: "annotation",
+					label: "Annotation (Semantic)",
+					scale: 0.65,
+					defaultWeight: 400,
+					trackingEm: 0.02,
+					lineHeightGroup: "body-semantic",
+					colorToken: "--md-sys-color-on-surface-variant",
+					previewText: "token · meta · annotation label",
+				},
 			];
 			const LINE_HEIGHT_GROUPS = [
 				{
@@ -2077,7 +2087,34 @@
 			}
 
 			/**
+			 * Serialise current Typography Studio state for the shared localStorage payload.
+			 * Produces a flat map of roleId → { sizePx, weight, trackingEm, colorToken, family }.
+			 * `family` is a resolved CSS font-family string (e.g. '"Lato", sans-serif') so the
+			 * gallery can apply it directly without needing the builder's font catalog.
+			 * @returns {Record<string, {sizePx: number, weight: number, trackingEm: number, colorToken: string, family: string}>}
+			 * @example
+			 * const typo = buildTypographyPayload();
+			 */
+			function buildTypographyPayload() {
+				const payload = {};
+				TYPOGRAPHY_ROLE_DEFINITIONS.forEach((role) => {
+					const s = typographyRoleState.get(role.id);
+					if (!s) return;
+					payload[role.id] = {
+						sizePx:     s.sizePx,
+						weight:     s.weight,
+						trackingEm: s.trackingEm,
+						colorToken: s.colorToken,
+						family:     getPreviewFontStack(s.familyKey, s.weight),
+					};
+				});
+				return payload;
+			}
+
+			/**
 			 * Write builder selection to the shared localStorage sync key.
+			 * Includes serialised Typography Studio state so the gallery can apply
+			 * font choices and role metrics live.
 			 * No-op when builderSyncEnabled is false or required state is absent.
 			 * @returns {void}
 			 * @example
@@ -2090,11 +2127,12 @@
 				localStorage.setItem(
 					SHARED_STATE_KEY,
 					JSON.stringify({
-						theme_file: loadedThemeFileName,
+						theme_file:  loadedThemeFileName,
 						scheme_name: activeSchemeKey,
 						sync_enabled: true,
-						source: "builder",
-						updated_at: Date.now(),
+						source:      "builder",
+						updated_at:  Date.now(),
+						typography:  buildTypographyPayload(),
 					}),
 				);
 			}

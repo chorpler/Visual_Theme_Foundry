@@ -12,6 +12,7 @@ Purpose:
   - GET  /api/icons             — list icons/ files with grouped source summary
   - POST /api/export-package    — build zip with selected theme/fonts/icons
   - POST /api/theme/rename      — rename a material-theme-*.json file in color_themes/
+  - POST /api/theme/save        — write a new material-theme-*.json to color_themes/ (user custom themes)
   - POST /api/normalize-icons   — normalize uploaded SVGs → icons/normalized/
   - GET  /api/icons/normalized  — inventory of icons/normalized/ by weight + variant keys
 
@@ -805,6 +806,10 @@ class ThemeRequestHandler(SimpleHTTPRequestHandler):
             self._handle_theme_rename()
             return
 
+        if route == "/api/theme/save":
+            self._handle_theme_save()
+            return
+
         self._send_json(404, {"error": "unknown api route"})
 
     def _handle_theme_list(self) -> None:
@@ -1116,6 +1121,73 @@ class ThemeRequestHandler(SimpleHTTPRequestHandler):
         from_path.rename(to_path)
         LOGGER.info("Theme file renamed: %s -> %s", from_name, to_name)
         self._send_json(200, {"renamed": to_name})
+
+    def _handle_theme_save(self) -> None:
+        """
+        Write a new material-theme-*.json file to color_themes/.
+
+        Called by the gallery Theme Refinement Drawer when the user saves a
+        customised theme.  Always creates a new file — never overwrites an
+        existing one, so presets are never modified.
+
+        Expects JSON body:
+            file_name   — target file name, must match material-theme-*.json
+            theme_data  — full theme object to serialise (dict)
+
+        Returns JSON:
+            200  {"saved": "<file_name>"}
+            400  {"error": "<reason>"}   — bad input or name collision
+            500  {"error": "<reason>"}   — write failure
+
+        Example:
+            POST /api/theme/save
+            {"file_name": "material-theme-v1-custom.json", "theme_data": {...}}
+        """
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            body = json.loads(self.rfile.read(length))
+        except (ValueError, json.JSONDecodeError):
+            self._send_json(400, {"error": "invalid JSON body"})
+            return
+
+        file_name = body.get("file_name", "")
+        theme_data = body.get("theme_data")
+
+        if (
+            not isinstance(file_name, str)
+            or "/" in file_name
+            or "\\" in file_name
+            or not file_name.startswith("material-theme-")
+            or not file_name.endswith(".json")
+        ):
+            self._send_json(400, {"error": "invalid file name"})
+            return
+
+        if not isinstance(theme_data, dict):
+            self._send_json(400, {"error": "theme_data must be an object"})
+            return
+
+        project_root = Path(self.directory or ".").resolve()
+        theme_dir = (project_root / THEME_DIR_NAME).resolve()
+        target_path = (theme_dir / file_name).resolve()
+
+        if target_path.parent != theme_dir:
+            self._send_json(400, {"error": "path traversal not allowed"})
+            return
+
+        if target_path.exists():
+            self._send_json(400, {"error": f"{file_name} already exists — choose a different name"})
+            return
+
+        try:
+            target_path.write_text(json.dumps(theme_data, indent=2), encoding="utf-8")
+        except OSError as exc:
+            LOGGER.error("Theme save failed: %s", exc)
+            self._send_json(500, {"error": "failed to write theme file"})
+            return
+
+        LOGGER.info("User theme saved: %s", file_name)
+        self._send_json(200, {"saved": file_name})
 
     def _handle_single_theme(self, theme_file_name: str) -> None:
         """

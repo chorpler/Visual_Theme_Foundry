@@ -480,9 +480,11 @@
 
 		/* ===== TOKEN HINT ===== */
 		.token-hint {
-			font-family: "Courier New", monospace;
-			font-size: 0.65rem;
-			letter-spacing: 0.02em;
+			font-family: var(--vtf-typo-annotation-family, "Courier New", monospace);
+			font-size: var(--vtf-typo-annotation-size, 0.65rem);
+			font-weight: var(--vtf-typo-annotation-weight, 400);
+			letter-spacing: var(--vtf-typo-annotation-tracking, 0.02em);
+			color: var(--vtf-typo-annotation-color, var(--on-surface-variant));
 			opacity: 0.48;
 			margin: 6px 0 0;
 		}
@@ -597,6 +599,78 @@
 			background: transparent;
 			border: 1px solid var(--outline);
 			color: var(--on-surface);
+		}
+		/* Notification badge (M3) — overlaid on a host element's corner */
+		.badge-host {
+			position: relative;
+			display: inline-flex;
+		}
+		.notif-badge {
+			position: absolute;
+			top: -5px;
+			right: -6px;
+			min-width: 18px;
+			height: 18px;
+			border-radius: 999px;
+			background: var(--error);
+			color: var(--on-error);
+			font-size: 0.6rem;
+			font-weight: 700;
+			line-height: 1;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0 4px;
+			border: 2px solid var(--surface-container-lowest, var(--surface));
+			pointer-events: none;
+			white-space: nowrap;
+		}
+		.notif-badge-dot {
+			position: absolute;
+			top: -3px;
+			right: -3px;
+			width: 9px;
+			height: 9px;
+			border-radius: 50%;
+			background: var(--error);
+			border: 2px solid var(--surface-container-lowest, var(--surface));
+			pointer-events: none;
+		}
+		/* Semantic color variants */
+		.notif-badge-primary, .notif-badge-dot-primary     { background: var(--primary);   color: var(--on-primary);   }
+		.notif-badge-secondary, .notif-badge-dot-secondary { background: var(--secondary); color: var(--on-secondary); }
+		.notif-badge-tertiary, .notif-badge-dot-tertiary   { background: var(--tertiary);  color: var(--on-tertiary);  }
+		/* .notif-badge / .notif-badge-dot default to error — most common badge signal */
+		/* Badge demo layout */
+		.badge-demo-row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: flex-end;
+			gap: 28px;
+			margin-bottom: 8px;
+		}
+		.badge-demo-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 10px;
+			font-size: 0.65rem;
+			color: var(--on-surface-variant);
+			opacity: 0.7;
+		}
+		/* Placeholder icon button for badge demos */
+		.icon-btn-demo {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background: var(--surface-container-high);
+			border: none;
+			cursor: default;
+			font-size: 1.1rem;
+			color: var(--on-surface-variant);
 		}
 
 		/* ===== CARDS ===== */
@@ -1223,6 +1297,453 @@
 			color: var(--primary);
 		}
 
+		/* ===== SECTION EDIT BUTTON ===== */
+		.section-heading-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 4px;
+		}
+		.section-heading-row .section-heading {
+			margin: 0;
+		}
+		.section-edit-btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+			border: 1px solid var(--outline-variant);
+			background: none;
+			color: var(--on-surface-variant);
+			cursor: pointer;
+			font-size: 1.25rem;
+			flex-shrink: 0;
+			transition: background 0.15s, color 0.15s;
+		}
+		.section-edit-btn span {
+			display: inline-block;
+			transform: rotate(135deg);
+			line-height: 1;
+		}
+		.section-edit-btn:hover {
+			background: var(--surface-container-high);
+			color: var(--on-surface);
+		}
+
+		/* ===== THEME REFINEMENT DRAWER ===== */
+		.edit-drawer {
+			position: fixed;
+			top: 0;
+			right: 0;
+			height: 100vh;
+			width: min(380px, 92vw);
+			background: var(--surface-container-highest);
+			color: var(--on-surface);
+			transform: translateX(100%);
+			transition: transform 0.3s ease;
+			z-index: 300;
+			display: flex;
+			flex-direction: column;
+			box-shadow: -4px 0 24px rgba(0,0,0,0.22);
+			overflow: hidden;
+		}
+		.edit-drawer.is-open {
+			transform: translateX(0);
+		}
+		.edit-drawer-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 16px 20px;
+			border-bottom: 1px solid var(--outline-variant);
+			flex-shrink: 0;
+		}
+		.edit-drawer-title {
+			font-weight: 700;
+			font-size: 0.95rem;
+			margin: 0;
+		}
+		.edit-drawer-close {
+			background: none;
+			border: none;
+			font-size: 1.3rem;
+			color: var(--on-surface-variant);
+			cursor: pointer;
+			padding: 0;
+			line-height: 1;
+		}
+		.edit-drawer-body {
+			flex: 1;
+			overflow-y: auto;
+			padding: 20px;
+		}
+		.edit-drawer-footer {
+			display: flex;
+			gap: 10px;
+			justify-content: flex-end;
+			padding: 14px 20px;
+			border-top: 1px solid var(--outline-variant);
+			flex-shrink: 0;
+		}
+		/* Step 1 — selection */
+		.edit-step-label {
+			font-size: 0.88rem;
+			font-weight: 600;
+			margin: 0 0 14px;
+			color: var(--on-surface);
+		}
+		.edit-check-group {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+		.edit-check-row {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-size: 0.9rem;
+			cursor: pointer;
+		}
+		.edit-check-row input[type="checkbox"] {
+			width: 16px;
+			height: 16px;
+			accent-color: var(--primary);
+			cursor: pointer;
+		}
+		.edit-check-row.edit-check-disabled {
+			opacity: 0.4;
+			cursor: not-allowed;
+		}
+		.edit-na {
+			font-size: 0.72rem;
+			opacity: 0.55;
+		}
+		/* Step 2 — edit cards */
+		.edit-block {
+			margin-bottom: 24px;
+		}
+		.edit-block-title {
+			font-size: 0.75rem;
+			font-weight: 700;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			color: var(--on-surface-variant);
+			margin: 0 0 12px;
+			padding-bottom: 6px;
+			border-bottom: 1px solid var(--outline-variant);
+		}
+		/* Color edit card */
+		.color-edit-card {
+			background: var(--surface-container-high);
+			border-radius: 8px;
+			padding: 12px;
+			margin-bottom: 10px;
+		}
+		.color-edit-card-label {
+			font-family: "Courier New", monospace;
+			font-size: 0.68rem;
+			letter-spacing: 0.04em;
+			color: var(--on-surface-variant);
+			margin-bottom: 8px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.color-current-swatch {
+			display: inline-block;
+			width: 16px;
+			height: 16px;
+			border-radius: 3px;
+			border: 1px solid var(--outline-variant);
+			flex-shrink: 0;
+		}
+		.color-swatch-row {
+			display: flex;
+			gap: 6px;
+			margin-bottom: 6px;
+		}
+		.color-swatch-row-label {
+			font-size: 0.62rem;
+			opacity: 0.5;
+			margin-bottom: 3px;
+		}
+		.color-swatch {
+			width: 60px;
+			height: 30px;
+			border-radius: 4px;
+			border: 2px solid transparent;
+			cursor: pointer;
+			transition: border-color 0.15s, transform 0.1s;
+			flex-shrink: 0;
+		}
+		.color-swatch:hover {
+			transform: scale(1.06);
+		}
+		.color-swatch.is-selected {
+			border-color: var(--primary);
+			box-shadow: 0 0 0 2px var(--primary-container);
+		}
+		.color-swatch-custom-row {
+			margin-top: 6px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		/* ===== CUSTOM HSV COLOR PICKER (CCP) =====
+		   Inline expandable picker embedded in each color edit card.
+		   No native <input type="color"> — fully custom canvas + sliders.
+		   .ccp-wrap is hidden by default; .ccp-wrap.is-open reveals it. */
+		.ccp-wrap {
+			margin-top: 10px;
+			border-top: 1px solid var(--outline-variant);
+			padding-top: 12px;
+			display: none;
+			flex-direction: column;
+			gap: 10px;
+		}
+		.ccp-wrap.is-open { display: flex; }
+		.ccp-sv-wrap {
+			position: relative;
+			width: 100%;
+			border-radius: var(--radius-sm);
+			overflow: hidden;
+			cursor: crosshair;
+			border: 1px solid var(--outline-variant);
+			user-select: none;
+		}
+		.ccp-sv-canvas {
+			display: block;
+			width: 100%;
+			height: 148px;
+		}
+		.ccp-sv-cursor {
+			position: absolute;
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			border: 2px solid #fff;
+			box-shadow: 0 0 0 1.5px rgba(0,0,0,0.55);
+			pointer-events: none;
+			transform: translate(-50%, -50%);
+		}
+		.ccp-hue-track {
+			position: relative;
+			height: 18px;
+			border-radius: 9px;
+			background: linear-gradient(to right,
+				hsl(0,100%,50%), hsl(30,100%,50%), hsl(60,100%,50%),
+				hsl(90,100%,50%), hsl(120,100%,50%), hsl(150,100%,50%),
+				hsl(180,100%,50%), hsl(210,100%,50%), hsl(240,100%,50%),
+				hsl(270,100%,50%), hsl(300,100%,50%), hsl(330,100%,50%),
+				hsl(360,100%,50%));
+			cursor: pointer;
+			border: 1px solid var(--outline-variant);
+			user-select: none;
+		}
+		.ccp-hue-thumb {
+			position: absolute;
+			top: 50%;
+			width: 22px;
+			height: 22px;
+			border-radius: 50%;
+			background: #fff;
+			border: 2.5px solid #fff;
+			box-shadow: 0 1px 5px rgba(0,0,0,0.45);
+			transform: translate(-50%, -50%);
+			pointer-events: none;
+		}
+		.ccp-footer {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.ccp-preview-wrap {
+			display: flex;
+			border-radius: 5px;
+			overflow: hidden;
+			border: 1px solid var(--outline-variant);
+			flex-shrink: 0;
+		}
+		.ccp-preview-old,
+		.ccp-preview-new {
+			width: 24px;
+			height: 24px;
+		}
+		.ccp-hex-input {
+			flex: 1;
+			min-width: 0;
+			font-family: "Courier New", monospace;
+			font-size: 0.78rem;
+			padding: 4px 8px;
+			border: 1px solid var(--outline-variant);
+			border-radius: var(--radius-sm);
+			background: var(--surface-container-high);
+			color: var(--on-surface);
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+		}
+		.ccp-hex-input:focus {
+			outline: 2px solid var(--primary);
+			outline-offset: 1px;
+		}
+		/* Typography edit card */
+		.type-edit-card {
+			background: var(--surface-container-high);
+			border-radius: 8px;
+			padding: 12px;
+			margin-bottom: 10px;
+		}
+		.type-edit-card-label {
+			font-size: 0.72rem;
+			font-weight: 600;
+			color: var(--on-surface-variant);
+			margin-bottom: 10px;
+		}
+		.type-edit-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 8px;
+			margin-bottom: 8px;
+		}
+		.type-edit-field label {
+			display: block;
+			font-size: 0.65rem;
+			opacity: 0.6;
+			margin-bottom: 3px;
+		}
+		.type-edit-field input,
+		.type-edit-field select {
+			width: 100%;
+			font-size: 0.8rem;
+		}
+		.type-edit-preview {
+			margin-top: 10px;
+			padding: 8px;
+			background: var(--surface-container-lowest, var(--surface));
+			border-radius: 4px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		/* Save name input */
+		.save-name-field {
+			margin-top: 14px;
+		}
+		.save-name-field label {
+			font-size: 0.8rem;
+			font-weight: 600;
+			display: block;
+			margin-bottom: 6px;
+		}
+		.save-name-field input {
+			width: 100%;
+			font-family: "Courier New", monospace;
+			font-size: 0.78rem;
+		}
+		.save-scope-note {
+			margin-top: 10px;
+			font-size: 0.72rem;
+			opacity: 0.55;
+			line-height: 1.5;
+		}
+
+		/* ===== NUMBERS EDIT CARD ===== */
+		.num-feature-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 0;
+			border-bottom: 1px solid var(--outline-variant);
+			gap: 12px;
+		}
+		.num-feature-row:last-of-type { border-bottom: none; }
+		.num-feature-info {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			flex: 1;
+		}
+		.num-feature-label {
+			font-size: 0.82rem;
+			font-weight: 600;
+			color: var(--on-surface);
+		}
+		.num-feature-desc {
+			font-size: 0.68rem;
+			color: var(--on-surface-variant);
+			opacity: 0.75;
+		}
+		/* MD3-style toggle switch */
+		.num-toggle {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			flex-shrink: 0;
+			cursor: pointer;
+		}
+		.num-toggle input[type="checkbox"] {
+			opacity: 0;
+			width: 0;
+			height: 0;
+			position: absolute;
+		}
+		.num-toggle-track {
+			width: 44px;
+			height: 24px;
+			border-radius: 12px;
+			background: var(--surface-container-highest);
+			border: 2px solid var(--outline);
+			transition: background 0.2s, border-color 0.2s;
+			position: relative;
+		}
+		.num-toggle-knob {
+			position: absolute;
+			top: 50%;
+			left: 4px;
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background: var(--outline);
+			transform: translateY(-50%);
+			transition: left 0.2s, width 0.15s, background 0.2s;
+		}
+		.num-toggle input:checked ~ .num-toggle-track {
+			background: var(--primary);
+			border-color: var(--primary);
+		}
+		.num-toggle input:checked ~ .num-toggle-track .num-toggle-knob {
+			left: 22px;
+			width: 16px;
+			height: 16px;
+			background: var(--on-primary);
+		}
+		.num-toggle input:focus-visible ~ .num-toggle-track {
+			outline: 2px solid var(--primary);
+			outline-offset: 2px;
+		}
+		.num-feature-preview-wrap {
+			margin-bottom: 4px;
+			padding: 8px 10px;
+			background: var(--surface-container-lowest, var(--surface));
+			border-radius: 6px;
+			font-family: var(--vtf-typo-annotation-family, "Courier New", monospace);
+			font-size: 0.9rem;
+			color: var(--on-surface-variant);
+			display: flex;
+			gap: 16px;
+			align-items: baseline;
+			flex-wrap: wrap;
+		}
+		.num-feature-preview-label {
+			font-size: 0.62rem;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			opacity: 0.5;
+			align-self: center;
+		}
+
 		/* ===== NAV SECTION LAYOUT ===== */
 		.nav-demo-grid {
 			display: grid;
@@ -1385,24 +1906,24 @@
 		}
 
 		/* ── Depth-based rendering filters ── */
-		/* Deepest layers get underwater_murk + shimmer + blur; shallower layers get less */
+		/* Deepest layers get underwater_murk + shimmer; shallower layers get less */
 		#pond-layer-shadows {
-			filter: url(#water_shimmer) url(#underwater_murk) blur(3px);
+			filter: url(#water_shimmer) url(#underwater_murk);
 			opacity: 0.65;
 		}
 		/* brightness() applied after underwater_murk: darkens output proportionally to depth.
 		   White → #353535 ≈ 21% brightness at floor level; fish at depth attenuate toward that. */
 		/* drop-shadow placed last so it applies to the fully depth-processed fish image;
 		   shadow opacity decreases with depth — less ambient light = less visible shadow */
-		#pond-layer-koi04 { filter: url(#water_shimmer) blur(6px) url(#underwater_murk) brightness(0.44) drop-shadow(-8px -10px 6px rgba(0,0,0,0.2)); }
-		#pond-layer-koi03 { filter: url(#water_shimmer) blur(4px) url(#underwater_murk) brightness(0.56) drop-shadow(-8px -10px 5px rgba(0,0,0,0.3)); }
-		#pond-layer-koi02 { filter: url(#water_shimmer) blur(2px) brightness(0.8) drop-shadow(-8px -10px 4px rgba(0,0,0,0.4)); }
-		#pond-layer-koi01 { filter: url(#water_shimmer) blur(1px) brightness(0.8) drop-shadow(-8px -10px 3px rgba(0,0,0,0.55)); }
-		#pond-layer-ripples { filter: blur(10px) brightness(0.75); }
+		#pond-layer-koi04 { filter: url(#water_shimmer) url(#underwater_murk) brightness(0.44) drop-shadow(-8px -10px 6px rgba(0,0,0,0.2)); }
+		#pond-layer-koi03 { filter: url(#water_shimmer) url(#underwater_murk) brightness(0.56) drop-shadow(-8px -10px 5px rgba(0,0,0,0.3)); }
+		#pond-layer-koi02 { filter: url(#water_shimmer) brightness(0.8) drop-shadow(-8px -10px 4px rgba(0,0,0,0.4)); }
+		#pond-layer-koi01 { filter: url(#water_shimmer) brightness(0.8) drop-shadow(-8px -10px 3px rgba(0,0,0,0.55)); }
+		#pond-layer-ripples { filter: brightness(0.75); }
 		#pond-layer-lilyleaves { filter: drop-shadow(-30px -37px 3px rgba(0, 0, 0, 0.65)); }
-		#pond-layer-lilies  { filter: blur(1px) drop-shadow(0px -7px 1px rgba(0, 0, 0, 0.3)); }
+		#pond-layer-lilies  { filter: drop-shadow(0px -7px 1px rgba(0, 0, 0, 0.3)); }
 		#pond-layer-bamboo  {
-			filter: blur(0.25px) drop-shadow(-30px -37px 3px rgba(0, 0, 0, 0.75));
+			filter: drop-shadow(-30px -37px 3px rgba(0, 0, 0, 0.75));
 		}
 
 		/* ── koi-01: full-scene SVG with built-in orbit rig ── */
@@ -1791,7 +2312,10 @@
 
 		<!-- === SECTION 1: CONTENT === -->
 		<section class="gallery-section" id="section-content">
+			<div class="section-heading-row">
 			<h2 class="section-heading">Content</h2>
+			<button class="section-edit-btn" data-edit-section="section-content" title="Edit section theme" type="button"><span>✏</span></button>
+		</div>
 			<p class="section-sub">Cards with themed imagery, semantic badges, and structured list navigation &mdash; primary, secondary, and tertiary pairs in realistic content composition.</p>
 			<div class="content-grid">
 				<!-- Card grid -->
@@ -1858,7 +2382,10 @@
 
 		<!-- === SECTION 2: FORMS === -->
 		<section class="gallery-section" id="section-forms">
+			<div class="section-heading-row">
 			<h2 class="section-heading">Forms</h2>
+			<button class="section-edit-btn" data-edit-section="section-forms" title="Edit section theme" type="button"><span>✏</span></button>
+		</div>
 			<p class="section-sub">Plain Old Semantic HTML &mdash; all standard input elements with themed focus states and semantic validation signaling.</p>
 			<div class="form-wrap">
 				<form id="demoForm" novalidate>
@@ -1935,8 +2462,11 @@
 
 		<!-- === SECTION 3: FEEDBACK & STATE === -->
 		<section class="gallery-section" id="section-feedback">
+			<div class="section-heading-row">
 			<h2 class="section-heading">Feedback &amp; State</h2>
-			<p class="section-sub">Alerts, toast notifications, spinners, progress bars, and tooltips &mdash; semantic color as status signal throughout the UI lifecycle.</p>
+			<button class="section-edit-btn" data-edit-section="section-feedback" title="Edit section theme" type="button"><span>✏</span></button>
+		</div>
+			<p class="section-sub">Alerts, toast notifications, spinners, progress bars, tooltips, and notification badges &mdash; semantic color as status signal throughout the UI lifecycle.</p>
 
 			<div class="alert-grid">
 				<div class="alert alert-info" role="alert">
@@ -2007,12 +2537,63 @@
 					</div>
 					<p class="token-hint">inverseSurface &middot; inverseOnSurface</p>
 				</div>
+
+				<!-- Notification Badges -->
+				<div class="feedback-group" style="grid-column: 1 / -1">
+					<h4>Notification Badges</h4>
+
+					<p style="font-size:0.8rem;opacity:0.7;margin:0 0 14px">Dot badge (no count) and numbered badge — both overlaid on host elements. Error is the default semantic signal; primary/secondary/tertiary available for softer states.</p>
+
+					<div style="margin-bottom:6px;font-size:0.72rem;font-weight:600;opacity:0.6;letter-spacing:0.04em;text-transform:uppercase">Dot &mdash; unread indicator</div>
+					<div class="badge-demo-row">
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#9993;</button><span class="notif-badge-dot"></span></span>
+							Error (default)
+						</div>
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#128276;</button><span class="notif-badge-dot notif-badge-dot-primary"></span></span>
+							Primary
+						</div>
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#128172;</button><span class="notif-badge-dot notif-badge-dot-secondary"></span></span>
+							Secondary
+						</div>
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#9734;</button><span class="notif-badge-dot notif-badge-dot-tertiary"></span></span>
+							Tertiary
+						</div>
+					</div>
+
+					<div style="margin:14px 0 6px;font-size:0.72rem;font-weight:600;opacity:0.6;letter-spacing:0.04em;text-transform:uppercase">Numbered &mdash; count badge</div>
+					<div class="badge-demo-row">
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#9993;</button><span class="notif-badge">3</span></span>
+							3 unread
+						</div>
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#128276;</button><span class="notif-badge notif-badge-primary">12</span></span>
+							12 alerts
+						</div>
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#128172;</button><span class="notif-badge notif-badge-secondary">48</span></span>
+							48 messages
+						</div>
+						<div class="badge-demo-item">
+							<span class="badge-host"><button class="icon-btn-demo" tabindex="-1">&#9993;</button><span class="notif-badge">99+</span></span>
+							Overflow (99+)
+						</div>
+					</div>
+					<p class="token-hint">error &middot; primary &middot; secondary &middot; tertiary &mdash; each with their on-color pair</p>
+				</div>
 			</div>
 		</section>
 
 		<!-- === SECTION 4: NAVIGATION & OVERLAY === -->
 		<section class="gallery-section" id="section-nav">
+			<div class="section-heading-row">
 			<h2 class="section-heading">Navigation &amp; Overlay</h2>
+			<button class="section-edit-btn" data-edit-section="section-nav" title="Edit section theme" type="button"><span>✏</span></button>
+		</div>
 			<p class="section-sub">Breadcrumb, pagination, dropdown, button variants, modal, and offcanvas &mdash; color in wayfinding chrome and overlay surfaces.</p>
 
 			<div class="nav-demo-grid">
@@ -2104,7 +2685,10 @@
 
 		<!-- === SECTION 5: DATA === -->
 		<section class="gallery-section" id="section-data">
+			<div class="section-heading-row">
 			<h2 class="section-heading">Data</h2>
+			<button class="section-edit-btn" data-edit-section="section-data" title="Edit section theme" type="button"><span>✏</span></button>
+		</div>
 			<p class="section-sub">Tables with striped rows and hover states, plus native date-time, number, and range inputs &mdash; primary in structural chrome and interactive focus.</p>
 
 			<div class="table-wrap">
@@ -2184,7 +2768,7 @@
 		<!-- === SECTION 6: KOI POND === -->
 		<section class="gallery-section" id="section-pond">
 			<h2 class="section-heading">Koi Pond</h2>
-			<p class="section-sub">Layered SVG scene with CSS animation &mdash; depth-based blur, orbital fish paths, procedural water shimmer, and parallax. Fish swim beyond the frame boundary; pond clips at edge.</p>
+			<p class="section-sub">Layered SVG scene with CSS animation &mdash; depth-based color transform, orbital fish paths, procedural water shimmer, and parallax. Fish swim beyond the frame boundary; pond clips at edge.</p>
 
 			<!-- Headless SVG filter library — zero layout space, fully parsed by browser.
 			     Filters defined here are available via filter:url(#id) anywhere in the DOM. -->
@@ -2314,6 +2898,17 @@
 		</nav>
 	</aside>
 	<div class="offcanvas-backdrop" id="offcanvasBackdrop"></div>
+
+	<!-- Theme Refinement Drawer -->
+	<aside class="edit-drawer" id="editDrawer" aria-hidden="true" aria-label="Theme refinement editor">
+		<div class="edit-drawer-header">
+			<p class="edit-drawer-title" id="editDrawerTitle">Edit Section</p>
+			<button class="edit-drawer-close" id="editDrawerClose" aria-label="Close editor" type="button">&times;</button>
+		</div>
+		<div class="edit-drawer-body" id="editDrawerBody"></div>
+		<div class="edit-drawer-footer" id="editDrawerFooter"></div>
+	</aside>
+	<div class="offcanvas-backdrop" id="editDrawerBackdrop"></div>
 
 	<script>
 		// ===== CONSTANTS =====
@@ -3150,6 +3745,793 @@
 			setStatus("Gallery sync state is now local-only.");
 		});
 
+		// ===== TYPOGRAPHY SYNC =====
+		// Applies serialised Typography Studio state from the builder's shared
+		// localStorage payload.  Called on page load (if sync is active) and on
+		// every subsequent storage event from the builder.
+		// Sets CSS custom properties on :root so gallery classes that use
+		// var(--vtf-typo-*) automatically reflect builder changes live.
+		function applyTypographyState(typo) {
+			if (!typo || typeof typo !== "object") return;
+			const root = document.documentElement;
+			Object.entries(typo).forEach(([roleId, role]) => {
+				if (!role || typeof role !== "object") return;
+				const name = roleId.replace(/[^a-z0-9-]/g, "-");
+				if (role.sizePx)          root.style.setProperty(`--vtf-typo-${name}-size`,     `${(role.sizePx / 16).toFixed(4)}rem`);
+				if (role.weight)          root.style.setProperty(`--vtf-typo-${name}-weight`,   String(role.weight));
+				if (role.trackingEm != null) root.style.setProperty(`--vtf-typo-${name}-tracking`, `${role.trackingEm}em`);
+				if (role.colorToken)      root.style.setProperty(`--vtf-typo-${name}-color`,    `var(${role.colorToken})`);
+				if (role.family)          root.style.setProperty(`--vtf-typo-${name}-family`,   role.family);
+			});
+		}
+
+		// Live cross-page sync: when builder updates localStorage, apply
+		// theme/scheme and typography immediately without a page reload.
+		window.addEventListener("storage", (e) => {
+			if (e.key !== SHARED_STATE_KEY || !state.syncEnabled) return;
+			try {
+				const shared = e.newValue ? JSON.parse(e.newValue) : null;
+				if (!shared || shared.source !== "builder") return;
+				if (shared.typography) applyTypographyState(shared.typography);
+				// If theme or scheme changed, reload theme data
+				if (
+					shared.theme_file &&
+					shared.scheme_name &&
+					(shared.theme_file !== state.themeFiles[state.themeIndex] ||
+					 shared.scheme_name !== state.schemeName)
+				) {
+					const idx = state.themeFiles.indexOf(shared.theme_file);
+					if (idx >= 0) {
+						state.themeIndex = idx;
+						state.schemeName = shared.scheme_name;
+						loadThemeByIndex(idx, true).catch(() => {});
+					}
+				}
+			} catch (_) {}
+		});
+
+		// ===== CUSTOM HSV COLOR PICKER =====
+		// createInlineColorPicker(initialHex, onApply, onCancel) → DOM element (.ccp-wrap)
+		// The element is hidden by default (.ccp-wrap) and shown via .ccp-wrap.is-open.
+		// Exposes ._refresh() so the caller can trigger a canvas repaint after layout.
+		//
+		// Components:
+		//   - SV canvas: 2D gradient (white→hue color horizontally, transparent→black vertically)
+		//     Click/drag picks saturation (x) + value (y).
+		//   - Hue slider: rainbow strip, drag thumb sets hue (0–360).
+		//   - Preview swatch: left half = original, right half = current selection.
+		//   - Hex input: direct entry; validates on change and syncs canvas/slider.
+		//   - Apply / Cancel buttons.
+
+		function hexToHsv(hex) {
+			const r = parseInt(hex.slice(1, 3), 16) / 255;
+			const g = parseInt(hex.slice(3, 5), 16) / 255;
+			const b = parseInt(hex.slice(5, 7), 16) / 255;
+			const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+			let h = 0;
+			if (d !== 0) {
+				switch (max) {
+					case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+					case g: h = ((b - r) / d + 2) / 6; break;
+					case b: h = ((r - g) / d + 4) / 6; break;
+				}
+			}
+			return { h: h * 360, s: max === 0 ? 0 : d / max, v: max };
+		}
+
+		function hsvToHex(h, s, v) {
+			// h: 0–360, s: 0–1, v: 0–1
+			const i = Math.floor(h / 60) % 6;
+			const f = h / 60 - Math.floor(h / 60);
+			const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+			const rgb = [[v,t,p],[q,v,p],[p,v,t],[p,q,v],[t,p,v],[v,p,q]][i];
+			return "#" + rgb.map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("").toUpperCase();
+		}
+
+		function renderSvCanvas(canvas, hue) {
+			const ctx = canvas.getContext("2d");
+			const w = canvas.width, h = canvas.height;
+			const colorStop = `hsl(${hue},100%,50%)`;
+			const sg = ctx.createLinearGradient(0, 0, w, 0);
+			sg.addColorStop(0, "#fff");
+			sg.addColorStop(1, colorStop);
+			ctx.fillStyle = sg;
+			ctx.fillRect(0, 0, w, h);
+			const dg = ctx.createLinearGradient(0, 0, 0, h);
+			dg.addColorStop(0, "rgba(0,0,0,0)");
+			dg.addColorStop(1, "rgba(0,0,0,1)");
+			ctx.fillStyle = dg;
+			ctx.fillRect(0, 0, w, h);
+		}
+
+		function createInlineColorPicker(initialHex, onApply, onCancel) {
+			let { h, s, v } = hexToHsv(initialHex);
+			let currentHex = initialHex.toUpperCase();
+
+			// — DOM —
+			const wrap = document.createElement("div");
+			wrap.className = "ccp-wrap";
+
+			// SV area
+			const svWrap = document.createElement("div");
+			svWrap.className = "ccp-sv-wrap";
+			const canvas = document.createElement("canvas");
+			canvas.className = "ccp-sv-canvas";
+			canvas.width = 320; canvas.height = 148;
+			const cursor = document.createElement("div");
+			cursor.className = "ccp-sv-cursor";
+			svWrap.append(canvas, cursor);
+
+			// Hue slider
+			const hueTrack = document.createElement("div");
+			hueTrack.className = "ccp-hue-track";
+			const hueThumb = document.createElement("div");
+			hueThumb.className = "ccp-hue-thumb";
+			hueTrack.appendChild(hueThumb);
+
+			// Footer
+			const footer = document.createElement("div");
+			footer.className = "ccp-footer";
+			const previewWrap = document.createElement("div");
+			previewWrap.className = "ccp-preview-wrap";
+			const previewOld = document.createElement("div");
+			previewOld.className = "ccp-preview-old";
+			previewOld.title = "Original";
+			previewOld.style.background = initialHex;
+			const previewNew = document.createElement("div");
+			previewNew.className = "ccp-preview-new";
+			previewNew.title = "Current";
+			previewWrap.append(previewOld, previewNew);
+			const hexInput = document.createElement("input");
+			hexInput.type = "text";
+			hexInput.className = "ccp-hex-input";
+			hexInput.maxLength = 7;
+			const cancelBtn = document.createElement("button");
+			cancelBtn.type = "button";
+			cancelBtn.className = "btn btn-text btn-sm";
+			cancelBtn.textContent = "Cancel";
+			const applyBtn = document.createElement("button");
+			applyBtn.type = "button";
+			applyBtn.className = "btn btn-primary btn-sm";
+			applyBtn.textContent = "Apply";
+			footer.append(previewWrap, hexInput, cancelBtn, applyBtn);
+
+			wrap.append(svWrap, hueTrack, footer);
+
+			// — State update —
+			function update(skipHexInput) {
+				renderSvCanvas(canvas, h);
+				const cw = svWrap.offsetWidth  || canvas.width;
+				const ch = svWrap.offsetHeight || canvas.height;
+				cursor.style.left = (s * cw) + "px";
+				cursor.style.top  = ((1 - v) * ch) + "px";
+				hueThumb.style.left = (h / 360 * 100) + "%";
+				currentHex = hsvToHex(h, s, v);
+				previewNew.style.background = currentHex;
+				if (!skipHexInput) hexInput.value = currentHex;
+			}
+			wrap._refresh = () => update(false);
+
+			// — SV drag —
+			function onSvMove(e) {
+				const r = canvas.getBoundingClientRect();
+				s = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+				v = Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height));
+				update(false);
+			}
+			svWrap.addEventListener("pointerdown", (e) => {
+				onSvMove(e);
+				svWrap.setPointerCapture(e.pointerId);
+				svWrap.addEventListener("pointermove", onSvMove);
+				svWrap.addEventListener("pointerup", () => svWrap.removeEventListener("pointermove", onSvMove), { once: true });
+			});
+
+			// — Hue drag —
+			function onHueMove(e) {
+				const r = hueTrack.getBoundingClientRect();
+				h = Math.max(0, Math.min(360, (e.clientX - r.left) / r.width * 360));
+				update(false);
+			}
+			hueTrack.addEventListener("pointerdown", (e) => {
+				onHueMove(e);
+				hueTrack.setPointerCapture(e.pointerId);
+				hueTrack.addEventListener("pointermove", onHueMove);
+				hueTrack.addEventListener("pointerup", () => hueTrack.removeEventListener("pointermove", onHueMove), { once: true });
+			});
+
+			// — Hex input —
+			hexInput.addEventListener("input", () => {
+				const val = hexInput.value.trim();
+				if (/^#[0-9a-f]{6}$/i.test(val)) {
+					({ h, s, v } = hexToHsv(val));
+					update(true);
+				}
+			});
+
+			// — Buttons —
+			applyBtn.addEventListener("click", () => onApply(currentHex));
+			cancelBtn.addEventListener("click", () => onCancel());
+
+			// Init display
+			previewNew.style.background = initialHex;
+			hexInput.value = initialHex.toUpperCase();
+			// Canvas renders on first _refresh() call (after element is in DOM + laid out)
+			return wrap;
+		}
+
+		// ===== COLOR UTILITIES (for drawer palette generation) =====
+		// These use 0-1 range for all HSL components — distinct from hexToRgb/rgbToHsl/hslToHex
+		// which use degrees (h) and percents (s, l) for the SVG tinting pipeline.
+		function hexToHsl01(hex) {
+			const h = hex.replace("#", "");
+			const r = parseInt(h.slice(0, 2), 16) / 255;
+			const g = parseInt(h.slice(2, 4), 16) / 255;
+			const b = parseInt(h.slice(4, 6), 16) / 255;
+			const max = Math.max(r, g, b), min = Math.min(r, g, b);
+			let hue = 0, sat = 0;
+			const lig = (max + min) / 2;
+			if (max !== min) {
+				const d = max - min;
+				sat = lig > 0.5 ? d / (2 - max - min) : d / (max + min);
+				switch (max) {
+					case r: hue = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+					case g: hue = ((b - r) / d + 2) / 6; break;
+					case b: hue = ((r - g) / d + 4) / 6; break;
+				}
+			}
+			return [hue, sat, lig];
+		}
+
+		function hsl01ToHex(h, s, l) {
+			const hue2rgb = (p, q, t) => {
+				if (t < 0) t += 1; if (t > 1) t -= 1;
+				if (t < 1 / 6) return p + (q - p) * 6 * t;
+				if (t < 1 / 2) return q;
+				if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+				return p;
+			};
+			let r, g, b;
+			if (s === 0) {
+				r = g = b = l;
+			} else {
+				const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+				const p = 2 * l - q;
+				r = hue2rgb(p, q, h + 1 / 3);
+				g = hue2rgb(p, q, h);
+				b = hue2rgb(p, q, h - 1 / 3);
+			}
+			return "#" + [r, g, b].map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("").toUpperCase();
+		}
+
+		function generateShadeVariants(hex) {
+			const [h, s, l] = hexToHsl01(hex);
+			return [
+				hsl01ToHex(h, s, Math.max(0.05, l - 0.20)),
+				hex.toUpperCase(),
+				hsl01ToHex(h, s, Math.min(0.95, l + 0.20)),
+			];
+		}
+
+		// Pulls hues from secondary, tertiary, and error tokens in the active scheme,
+		// remapped onto the source token's saturation + lightness for palette coherence.
+		function generateHueVariants(hex, scheme) {
+			const [, s, l] = hexToHsl01(hex);
+			return ["secondary", "tertiary", "error"].map((token) => {
+				const candidateHex = scheme[token];
+				if (!candidateHex) return hex.toUpperCase();
+				const [candidateH] = hexToHsl01(candidateHex);
+				return hsl01ToHex(candidateH, s, l);
+			});
+		}
+
+		// ===== SECTION MANIFEST =====
+		// Declares which color tokens and type roles each section uses.
+		// Drives what appears in the Theme Refinement Drawer for that section.
+		const SECTION_MANIFEST = {
+			"section-content": {
+				label: "Content",
+				colors: ["primary", "primaryContainer", "onPrimaryContainer", "secondary", "secondaryContainer", "onSecondaryContainer", "tertiary", "tertiaryContainer"],
+				typeRoles: ["card-heading", "body-copy", "label-large", "label-medium", "caption-note"],
+				hasNumbers: false,
+			},
+			"section-forms": {
+				label: "Forms",
+				colors: ["primary", "outline", "outlineVariant", "surface", "onSurface", "onSurfaceVariant", "error", "errorContainer", "onError", "surfaceContainerHigh"],
+				typeRoles: ["title-medium", "body-medium", "body-small", "label-large", "button-text", "caption-note"],
+				hasNumbers: false,
+			},
+			"section-feedback": {
+				label: "Feedback & State",
+				colors: ["primary", "primaryContainer", "onPrimaryContainer", "secondary", "secondaryContainer", "tertiary", "tertiaryContainer", "error", "errorContainer", "onError"],
+				typeRoles: ["title-medium", "body-medium", "label-medium", "label-small", "annotation"],
+				hasNumbers: false,
+			},
+			"section-nav": {
+				label: "Navigation & Overlay",
+				colors: ["primary", "secondary", "surface", "surfaceContainerHigh", "surfaceContainerHighest", "onSurface", "outline", "outlineVariant"],
+				typeRoles: ["title-small", "body-small", "label-medium", "button-text", "annotation"],
+				hasNumbers: false,
+			},
+			"section-data": {
+				label: "Data",
+				colors: ["primary", "surfaceContainerLow", "surfaceContainerHigh", "onSurface", "onSurfaceVariant", "outlineVariant"],
+				typeRoles: ["label-large", "body-medium", "label-medium", "annotation", "caption-note"],
+				hasNumbers: true,
+			},
+		};
+
+		// ===== THEME REFINEMENT DRAWER =====
+		// editState tracks the active section, user selections, and pending edits
+		// for the current drawer session.  Cleared on every openSectionEditor() call.
+		const editState = {
+			sectionId:  null,
+			selections:  { colors: false, typography: false, numbers: false },
+			colorEdits:  {},   // tokenName → hex string
+			typeEdits:   {},   // roleId    → { sizePx, weight, trackingEm, colorToken }
+			numberEdits: {},   // feature key → bool: { ordinal, tabularNums, slashedZero }
+		};
+
+		function openSectionEditor(sectionId) {
+			const manifest = SECTION_MANIFEST[sectionId];
+			if (!manifest) return;
+			editState.sectionId  = sectionId;
+			editState.selections = { colors: false, typography: false, numbers: false };
+			editState.colorEdits  = {};
+			editState.typeEdits   = {};
+			editState.numberEdits = {};
+			document.getElementById("editDrawerTitle").textContent = `Edit: ${manifest.label}`;
+			renderDrawerStep1(manifest);
+			const drawer   = document.getElementById("editDrawer");
+			const backdrop = document.getElementById("editDrawerBackdrop");
+			drawer.classList.add("is-open");
+			drawer.setAttribute("aria-hidden", "false");
+			backdrop.classList.add("is-open");
+		}
+
+		function closeEditDrawer() {
+			const drawer   = document.getElementById("editDrawer");
+			const backdrop = document.getElementById("editDrawerBackdrop");
+			drawer.classList.remove("is-open");
+			drawer.setAttribute("aria-hidden", "true");
+			backdrop.classList.remove("is-open");
+		}
+
+		function renderDrawerStep1(manifest) {
+			const body   = document.getElementById("editDrawerBody");
+			const footer = document.getElementById("editDrawerFooter");
+			body.innerHTML = `
+				<p class="edit-step-label">What would you like to edit?</p>
+				<div class="edit-check-group">
+					<label class="edit-check-row">
+						<input type="checkbox" id="edit-sel-colors"> Colors
+					</label>
+					<label class="edit-check-row">
+						<input type="checkbox" id="edit-sel-typography"> Typography
+					</label>
+					<label class="edit-check-row${manifest.hasNumbers ? "" : " edit-check-disabled"}">
+						<input type="checkbox" id="edit-sel-numbers"${manifest.hasNumbers ? "" : " disabled"}>
+						Numbers${manifest.hasNumbers ? "" : ' <span class="edit-na">(n/a in this section)</span>'}
+					</label>
+				</div>`;
+			footer.innerHTML = `<button class="btn btn-primary btn-sm" id="editDrawerContinue">Continue →</button>`;
+			document.getElementById("editDrawerContinue").addEventListener("click", () => {
+				const colors     = document.getElementById("edit-sel-colors")?.checked     || false;
+				const typography = document.getElementById("edit-sel-typography")?.checked || false;
+				const numbers    = document.getElementById("edit-sel-numbers")?.checked    || false;
+				if (!colors && !typography && !numbers) return;
+				editState.selections = { colors, typography, numbers };
+				renderDrawerStep2(SECTION_MANIFEST[editState.sectionId]);
+			});
+		}
+
+		function renderDrawerStep2(manifest) {
+			const body   = document.getElementById("editDrawerBody");
+			const footer = document.getElementById("editDrawerFooter");
+			body.innerHTML = "";
+			const scheme = state.themeData?.schemes?.[state.schemeName] || {};
+
+			if (editState.selections.colors) {
+				const block = document.createElement("div");
+				block.className = "edit-block";
+				block.innerHTML = `<h4 class="edit-block-title">Colors</h4>`;
+				manifest.colors.forEach((tokenName) => {
+					const currentHex = scheme[tokenName];
+					if (!currentHex) return;
+					block.appendChild(buildColorEditCard(tokenName, currentHex, scheme));
+				});
+				body.appendChild(block);
+			}
+
+			if (editState.selections.typography) {
+				const block = document.createElement("div");
+				block.className = "edit-block";
+				block.innerHTML = `<h4 class="edit-block-title">Typography</h4>`;
+				// Read current type state from shared localStorage if available
+				const sharedTypo = (() => {
+					try { return JSON.parse(localStorage.getItem(SHARED_STATE_KEY))?.typography || {}; }
+					catch (_) { return {}; }
+				})();
+				manifest.typeRoles.forEach((roleId) => {
+					block.appendChild(buildTypeEditCard(roleId, sharedTypo[roleId]));
+				});
+				body.appendChild(block);
+			}
+
+			if (editState.selections.numbers) {
+				const block = document.createElement("div");
+				block.className = "edit-block";
+				block.innerHTML = `<h4 class="edit-block-title">Numbers</h4>`;
+				block.appendChild(buildNumberEditCard());
+				body.appendChild(block);
+			}
+
+			footer.innerHTML = `
+				<button class="btn btn-outlined btn-sm" id="editDrawerBack">← Back</button>
+				<button class="btn btn-primary btn-sm" id="editDrawerSave">Save as Theme…</button>`;
+			document.getElementById("editDrawerBack").addEventListener("click", () => renderDrawerStep1(manifest));
+			document.getElementById("editDrawerSave").addEventListener("click", () => renderSaveDialog());
+		}
+
+		// ===== NUMBER FEATURE EDIT CARD =====
+		// Renders toggle switches for three OpenType numeric feature variants.
+		// Live preview updates immediately when a toggle is flipped.
+		// Writes to editState.numberEdits: { ordinal: bool, tabularNums: bool, slashedZero: bool }
+		// Saved to themeData.numberFeatures (top-level, scheme-agnostic).
+		//
+		// CSS properties used:
+		//   ordinal      → font-variant-numeric: ordinal      (1st 2nd 3rd superscript markers)
+		//   tabularNums  → font-variant-numeric: tabular-nums  (equal-width digits for alignment)
+		//   slashedZero  → font-variant-numeric: slashed-zero  (0 with diagonal slash vs O)
+		function buildNumberEditCard() {
+			const FEATURES = [
+				{
+					key:     "ordinal",
+					label:   "Ordinal",
+					desc:    "Superscript ordinal markers — 1st, 2nd, 3rd",
+					cssVal:  "ordinal",
+					samples: [
+						{ text: "1st  2nd  3rd  4th", tag: "Ordinal on" },
+						{ text: "1st  2nd  3rd  4th", tag: "Ordinal off", baseline: true },
+					],
+				},
+				{
+					key:     "tabularNums",
+					label:   "Tabular Figures",
+					desc:    "Equal-width digits for column alignment",
+					cssVal:  "tabular-nums",
+					samples: [
+						{ text: "1,234.00\n7,890.12\n4,567.89", tag: "Tabular" },
+					],
+				},
+				{
+					key:     "slashedZero",
+					label:   "Slashed Zero",
+					desc:    "Distinguishes 0 from O in data display",
+					cssVal:  "slashed-zero",
+					samples: [
+						{ text: "0O  10010  0xFF  O0O", tag: "0 vs O" },
+					],
+				},
+			];
+
+			const container = document.createElement("div");
+
+			FEATURES.forEach(({ key, label, desc, cssVal, samples }) => {
+				// Row: label/desc on left, toggle on right
+				const row = document.createElement("div");
+				row.className = "num-feature-row";
+
+				const info = document.createElement("div");
+				info.className = "num-feature-info";
+				const labelEl = document.createElement("span");
+				labelEl.className = "num-feature-label";
+				labelEl.textContent = label;
+				const descEl = document.createElement("span");
+				descEl.className = "num-feature-desc";
+				descEl.textContent = desc;
+				info.append(labelEl, descEl);
+
+				// Toggle switch — MD3-style track + knob
+				const toggleLabel = document.createElement("label");
+				toggleLabel.className = "num-toggle";
+				const checkbox = document.createElement("input");
+				checkbox.type = "checkbox";
+				checkbox.checked = Boolean(editState.numberEdits[key]);
+				const track = document.createElement("span");
+				track.className = "num-toggle-track";
+				const knob = document.createElement("span");
+				knob.className = "num-toggle-knob";
+				track.appendChild(knob);
+				toggleLabel.append(checkbox, track);
+				row.append(info, toggleLabel);
+
+				// Preview block
+				const previewWrap = document.createElement("div");
+				previewWrap.className = "num-feature-preview-wrap";
+				const previewLbl = document.createElement("span");
+				previewLbl.className = "num-feature-preview-label";
+				previewLbl.textContent = label + ":";
+				const previewText = document.createElement("span");
+				previewText.textContent = samples[0].text;
+				previewWrap.append(previewLbl, previewText);
+
+				function applyFeature() {
+					previewText.style.fontVariantNumeric = checkbox.checked ? cssVal : "";
+				}
+				applyFeature();
+
+				checkbox.addEventListener("change", () => {
+					editState.numberEdits[key] = checkbox.checked;
+					applyFeature();
+				});
+
+				container.append(row, previewWrap);
+			});
+
+			return container;
+		}
+
+		function buildColorEditCard(tokenName, currentHex, scheme) {
+			const card = document.createElement("div");
+			card.className = "color-edit-card";
+
+			const labelRow = document.createElement("div");
+			labelRow.className = "color-edit-card-label";
+			const swatch = document.createElement("span");
+			swatch.className = "color-current-swatch";
+			swatch.style.background = currentHex;
+			swatch.title = `Current: ${currentHex}`;
+			labelRow.append(swatch, document.createTextNode(tokenName));
+			card.appendChild(labelRow);
+
+			const shades = generateShadeVariants(currentHex);
+			const hues   = generateHueVariants(currentHex, scheme);
+
+			function makeSwatchRow(hexValues, rowLabel) {
+				const wrap = document.createElement("div");
+				const lbl = document.createElement("div");
+				lbl.className = "color-swatch-row-label";
+				lbl.textContent = rowLabel;
+				const row = document.createElement("div");
+				row.className = "color-swatch-row";
+				hexValues.forEach((hex) => {
+					const btn = document.createElement("button");
+					btn.type = "button";
+					btn.className = "color-swatch";
+					btn.style.background = hex;
+					btn.title = hex;
+					btn.addEventListener("click", () => {
+						card.querySelectorAll(".color-swatch").forEach((s) => s.classList.remove("is-selected"));
+						btn.classList.add("is-selected");
+						editState.colorEdits[tokenName] = hex;
+					});
+					row.appendChild(btn);
+				});
+				wrap.append(lbl, row);
+				return wrap;
+			}
+
+			card.appendChild(makeSwatchRow(shades, "Shades"));
+			card.appendChild(makeSwatchRow(hues,   "Hue variants (theme-matched)"));
+
+			// Custom picker — inline HSV picker, expands below the swatches on click.
+			const customRow = document.createElement("div");
+			customRow.className = "color-swatch-custom-row";
+			const customBtn = document.createElement("button");
+			customBtn.type = "button";
+			customBtn.className = "btn btn-text btn-sm";
+			customBtn.textContent = "Custom ▸";
+
+			const ccpEl = createInlineColorPicker(
+				currentHex,
+				(hex) => {
+					// Apply: commit edit, deselect swatches, close picker
+					card.querySelectorAll(".color-swatch").forEach((s) => s.classList.remove("is-selected"));
+					editState.colorEdits[tokenName] = hex;
+					swatch.style.background = hex;
+					ccpEl.classList.remove("is-open");
+					customBtn.textContent = "Custom ▸";
+				},
+				() => {
+					// Cancel: just close
+					ccpEl.classList.remove("is-open");
+					customBtn.textContent = "Custom ▸";
+				}
+			);
+
+			customBtn.addEventListener("click", () => {
+				const opening = !ccpEl.classList.contains("is-open");
+				ccpEl.classList.toggle("is-open");
+				customBtn.textContent = opening ? "Custom ▾" : "Custom ▸";
+				if (opening) requestAnimationFrame(() => ccpEl._refresh());
+			});
+
+			customRow.append(customBtn);
+			card.appendChild(customRow);
+			card.appendChild(ccpEl);
+			return card;
+		}
+
+		// TYPE_ROLE_LABELS maps role IDs to human-readable names for the drawer.
+		// Covers all TYPOGRAPHY_ROLE_DEFINITIONS IDs (builder) without requiring
+		// the builder to be loaded — the gallery is standalone.
+		const TYPE_ROLE_LABELS = {
+			"display-large":    "Display Large",   "display-medium":  "Display Medium",
+			"display-small":    "Display Small",   "headline-large":  "Headline Large",
+			"headline-medium":  "Headline Medium", "headline-small":  "Headline Small",
+			"title-large":      "Title Large",     "title-medium":    "Title Medium",
+			"title-small":      "Title Small",     "body-large":      "Body Large",
+			"body-medium":      "Body Medium",     "body-small":      "Body Small",
+			"label-large":      "Label Large",     "label-medium":    "Label Medium",
+			"label-small":      "Label Small",     "hero-title":      "Hero Title",
+			"section-heading":  "Section Heading", "card-heading":    "Card Heading",
+			"body-copy":        "Body Copy",       "small-print":     "Small Print",
+			"button-text":      "Button Text",     "caption-note":    "Caption Note",
+			"annotation":       "Annotation",
+		};
+
+		function buildTypeEditCard(roleId, currentState) {
+			// currentState may be undefined if the builder hasn't synced yet;
+			// fall back to sensible defaults so the card is always usable.
+			const sizePx     = currentState?.sizePx     ?? 13;
+			const weight     = currentState?.weight      ?? 400;
+			const trackingEm = currentState?.trackingEm ?? 0.02;
+			const colorToken = currentState?.colorToken ?? "--md-sys-color-on-surface-variant";
+
+			const card = document.createElement("div");
+			card.className = "type-edit-card";
+
+			const lbl = document.createElement("div");
+			lbl.className = "type-edit-card-label";
+			lbl.textContent = TYPE_ROLE_LABELS[roleId] ?? roleId;
+			card.appendChild(lbl);
+
+			// Controls grid
+			const grid = document.createElement("div");
+			grid.className = "type-edit-row";
+
+			function makeField(labelText, inputEl) {
+				const wrap = document.createElement("div");
+				wrap.className = "type-edit-field";
+				const lbl = document.createElement("label");
+				lbl.textContent = labelText;
+				wrap.append(lbl, inputEl);
+				return wrap;
+			}
+
+			const sizeInput = document.createElement("input");
+			sizeInput.type = "number"; sizeInput.min = "8"; sizeInput.max = "160"; sizeInput.step = "0.5";
+			sizeInput.value = String(sizePx);
+
+			const weightSelect = document.createElement("select");
+			[100, 200, 300, 400, 500, 600, 700, 800, 900].forEach((w) => {
+				const opt = document.createElement("option");
+				opt.value = String(w); opt.textContent = String(w);
+				if (w === weight) opt.selected = true;
+				weightSelect.appendChild(opt);
+			});
+
+			const trackingInput = document.createElement("input");
+			trackingInput.type = "number"; trackingInput.min = "-0.2"; trackingInput.max = "0.4"; trackingInput.step = "0.005";
+			trackingInput.value = String(trackingEm);
+
+			grid.append(makeField("Size (px)", sizeInput), makeField("Weight", weightSelect));
+			const grid2 = document.createElement("div");
+			grid2.className = "type-edit-row";
+			grid2.appendChild(makeField("Tracking (em)", trackingInput));
+			card.append(grid, grid2);
+
+			// Live preview
+			const preview = document.createElement("div");
+			preview.className = "type-edit-preview";
+			const updatePreview = () => {
+				preview.style.fontSize     = `${sizeInput.value}px`;
+				preview.style.fontWeight   = weightSelect.value;
+				preview.style.letterSpacing = `${trackingInput.value}em`;
+				preview.style.color        = `var(${colorToken})`;
+				preview.textContent        = TYPE_ROLE_LABELS[roleId] ?? roleId;
+				editState.typeEdits[roleId] = {
+					sizePx:     Number(sizeInput.value),
+					weight:     Number(weightSelect.value),
+					trackingEm: Number(trackingInput.value),
+					colorToken,
+				};
+			};
+			[sizeInput, weightSelect, trackingInput].forEach((el) => el.addEventListener("input", updatePreview));
+			updatePreview();
+			card.appendChild(preview);
+			return card;
+		}
+
+		function renderSaveDialog() {
+			const body   = document.getElementById("editDrawerBody");
+			const footer = document.getElementById("editDrawerFooter");
+			const manifest = SECTION_MANIFEST[editState.sectionId];
+			const baseName = (state.themeFiles[state.themeIndex] || "material-theme-custom.json")
+				.replace(/\.json$/, "");
+			const suggested = `${baseName}-custom.json`;
+
+			body.innerHTML = `
+				<p class="edit-step-label">Save as new theme</p>
+				<p class="edit-na">Presets are never modified — your edits create a new file.</p>
+				<div class="save-name-field">
+					<label for="saveThemeName">File name</label>
+					<input type="text" id="saveThemeName" value="${suggested}" spellcheck="false">
+				</div>
+				<p class="save-scope-note">
+					Color edits apply to the active scheme (<strong>${state.schemeName}</strong>) only.<br>
+					Typography edits apply to all schemes.
+				</p>`;
+			footer.innerHTML = `
+				<button class="btn btn-outlined btn-sm" id="editDrawerBackToEdit">← Back</button>
+				<button class="btn btn-primary btn-sm" id="editDrawerConfirmSave">Save</button>`;
+			document.getElementById("editDrawerBackToEdit").addEventListener("click", () =>
+				renderDrawerStep2(manifest));
+			document.getElementById("editDrawerConfirmSave").addEventListener("click", () => {
+				const name = document.getElementById("saveThemeName").value.trim();
+				confirmSaveTheme(name);
+			});
+		}
+
+		async function confirmSaveTheme(fileName) {
+			if (!fileName.startsWith("material-theme-") || !fileName.endsWith(".json")) {
+				setStatus("File name must start with material-theme- and end with .json", true);
+				return;
+			}
+			if (!state.themeData) { setStatus("No theme data loaded.", true); return; }
+
+			const themeData = JSON.parse(JSON.stringify(state.themeData));
+
+			// Color edits — active scheme only
+			if (editState.selections.colors && Object.keys(editState.colorEdits).length > 0) {
+				if (!themeData.schemes[state.schemeName]) themeData.schemes[state.schemeName] = {};
+				Object.assign(themeData.schemes[state.schemeName], editState.colorEdits);
+			}
+
+			// Typography edits — stored at top level (scheme-agnostic)
+			if (editState.selections.typography && Object.keys(editState.typeEdits).length > 0) {
+				if (!themeData.typography) themeData.typography = {};
+				Object.assign(themeData.typography, editState.typeEdits);
+			}
+
+			// Number feature edits — stored at top level (scheme-agnostic)
+			if (editState.selections.numbers && Object.keys(editState.numberEdits).length > 0) {
+				if (!themeData.numberFeatures) themeData.numberFeatures = {};
+				Object.assign(themeData.numberFeatures, editState.numberEdits);
+			}
+
+			try {
+				const res = await fetch("/api/theme/save", {
+					method:  "POST",
+					headers: { "Content-Type": "application/json" },
+					body:    JSON.stringify({ theme_data: themeData, file_name: fileName }),
+				});
+				const json = await res.json();
+				if (!res.ok) throw new Error(json.error || "Save failed");
+				setStatus(`Saved as ${json.saved}`);
+				closeEditDrawer();
+				// Refresh theme file list so the new file appears in the nav
+				const listRes = await fetch(THEMES_ENDPOINT);
+				if (listRes.ok) {
+					const listData = await listRes.json();
+					state.themeFiles = listData.theme_files || state.themeFiles;
+				}
+			} catch (e) {
+				setStatus(e instanceof Error ? e.message : "Save failed", true);
+			}
+		}
+
+		function initEditDrawer() {
+			document.getElementById("editDrawerClose").addEventListener("click", closeEditDrawer);
+			document.getElementById("editDrawerBackdrop").addEventListener("click", closeEditDrawer);
+			document.querySelectorAll("[data-edit-section]").forEach((btn) => {
+				btn.addEventListener("click", () => openSectionEditor(btn.dataset.editSection));
+			});
+			// Apply typography from shared state on load if sync is active
+			const shared = readSharedState();
+			if (shared?.typography) applyTypographyState(shared.typography);
+		}
+
 		// ===== INIT =====
 		initCarousel(document.getElementById("heroCarousel"));
 		initScrollspy();
@@ -3159,6 +4541,7 @@
 		initDropdowns();
 		initRangeOutput();
 		initFormOutput();
+		initEditDrawer();
 		initializeGallery();
 	</script>
 </body>
